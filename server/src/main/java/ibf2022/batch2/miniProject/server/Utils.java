@@ -14,12 +14,15 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.opencsv.CSVReader;
+
+import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
 
 public class Utils {
     
@@ -154,7 +157,6 @@ public class Utils {
 		String timeString = time;
         DateFormat inputFormat = new SimpleDateFormat("h.mm a");
         DateFormat outputFormat = new SimpleDateFormat("HH:mm:ss");
-
         
 		Date date = inputFormat.parse(timeString);
 		String convertedTime = outputFormat.format(date);
@@ -208,6 +210,138 @@ public class Utils {
 		long secondsDifference = TimeUnit.MILLISECONDS.toSeconds(durationInMillis);
 
 		return secondsDifference;
+	}
+
+	public static Long getMinutes(String startTime, String endTime) throws ParseException {
+		String startTimeString = startTime;
+		String endTimeString = endTime;
+
+		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+
+		Date startTimeDate = format.parse(startTimeString);
+		Date endTimeDate = format.parse(endTimeString);
+
+		long durationInMillis = endTimeDate.getTime() - startTimeDate.getTime();
+		
+		long minutesDifference = TimeUnit.MILLISECONDS.toMinutes(durationInMillis);
+		if (durationInMillis % 60000 > 0) {
+			minutesDifference++;
+		}
+
+		return minutesDifference;
+	}
+
+	public static Double getFirstShoppingCost(String startTime, ShoppingCarPark sCP) throws ParseException {
+		List<String> listOfMin  = new LinkedList<>();
+		List<String> listOfRates = new LinkedList<>();
+		listOfMin.add(sCP.getMin1());
+		listOfMin.add(sCP.getMin2());
+		listOfMin.add(sCP.getMin3());
+		listOfMin.add(sCP.getMin4());
+		listOfRates.add(sCP.getRate1());
+		listOfRates.add(sCP.getRate2());
+		listOfRates.add(sCP.getRate3());
+		listOfRates.add(sCP.getRate4());
+
+		Long minutes = getMinutes(startTime, sCP.getEnd_time());
+		int i = 0;
+		int z = 0;
+		Double cost = (double) 0;
+
+		if (listOfMin.get(0).equals("0")) {
+			return Double.parseDouble(listOfRates.get(0));
+		} else if (listOfMin.get(0).equals("-")) {
+			return Double.parseDouble("0");
+		} else if ((listOfMin.get(0).equals("1")) || (listOfMin.get(0).equals("15"))) {
+			Long rounds = minutes/(Long.parseLong(listOfMin.get(0)));
+			if (minutes % (Long.parseLong(listOfMin.get(0))) > 0) {
+				rounds ++;
+			}
+
+			Double calculatedCost = rounds * Double.parseDouble(listOfRates.get(0));
+
+			return calculatedCost;
+		} else {
+			while (minutes > 0) {
+				minutes -= Long.parseLong(listOfMin.get(i));
+
+				if (i<3) {
+					i++;
+					continue;
+				} else {
+					z++;
+					continue;
+				}
+			}
+
+			for (int j = 0; j<i; j++) {
+				cost += Double.parseDouble(listOfRates.get(j));
+			}
+
+			for (int a = 0; a<z; a++) {
+				cost += Double.parseDouble(listOfRates.get(3));
+			}
+
+			return cost;
+		}
+			
+	}
+	
+
+	public static Double getSecondShoppingCost(String endTime, ShoppingCarPark sCP) throws ParseException {
+		List<String> listOfMin  = new LinkedList<>();
+		List<String> listOfRates = new LinkedList<>();
+		listOfMin.add(sCP.getMin1());
+		listOfMin.add(sCP.getMin2());
+		listOfMin.add(sCP.getMin3());
+		listOfMin.add(sCP.getMin4());
+		listOfRates.add(sCP.getRate1());
+		listOfRates.add(sCP.getRate2());
+		listOfRates.add(sCP.getRate3());
+		listOfRates.add(sCP.getRate4());
+
+		Long minutes = getMinutes(sCP.getStart_time(), endTime);
+		int i = 0;
+		int z = 0;
+		Double cost = (double) 0;
+
+		if (listOfMin.get(0).equals("0")) {
+			return Double.parseDouble(listOfRates.get(0));
+		} else if (listOfMin.get(0).equals("-")) {
+			return Double.parseDouble("0");
+		} else if ((listOfMin.get(0).equals("1")) || (listOfMin.get(0).equals("15"))) {
+			Long rounds = minutes/(Long.parseLong(listOfMin.get(0)));
+			if (minutes % (Long.parseLong(listOfMin.get(0))) > 0) {
+				rounds ++;
+			}
+
+			Double calculatedCost = rounds * Double.parseDouble(listOfRates.get(0));
+
+			return calculatedCost;
+		} else {
+			while (minutes > 0) {
+				minutes -= Long.parseLong(listOfMin.get(i));
+
+				if (i<3) {
+					i++;
+					continue;
+				} else {
+					z++;
+					continue;
+				}
+			}
+
+			for (int j = 0; j<i; j++) {
+				cost += Double.parseDouble(listOfRates.get(j));
+			}
+
+			for (int a = 0; a<z; a++) {
+				cost += Double.parseDouble(listOfRates.get(3));
+			}
+
+			return cost;
+
+		}
 	}
 
 	public static String getRateBasedOnDay(String dayOfWeek) {
@@ -268,6 +402,15 @@ public class Utils {
 			default:
 				return 7;
 		}
+	}
+
+	public static List<ShoppingCarPark> removeCarParks(List<ShoppingCarPark> list, String endTimeString) {
+		for (int i = 0; i<list.size(); i++) {
+			if (isAfter(list.get(i).getStart_time(), endTimeString)) {
+				list.remove(i);
+			}
+		}
+		return list;
 	}
 
 	public static String toTwoDecimalPlaces(double cost) {

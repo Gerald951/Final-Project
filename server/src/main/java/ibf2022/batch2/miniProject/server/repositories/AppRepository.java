@@ -30,7 +30,7 @@ public class AppRepository {
     public static final String GET_CARPARKS_ID = "select * from parkingLocation where address=?";
     public static final String GET_URA_RATES_A = "select * from URAcarpark where carpark_id=? and tstart_time < TIME(?)";
     public static final String GET_URA_RATES_B = "select * from URAcarpark where carpark_id=?";
-    public static final String GET_SHOPPING_RATES_A = "select * from shoppingCarparkRate where carpark_id=? and range_start<=? and range_end<=? and tstart_time < TIME(?)";
+    public static final String GET_SHOPPING_RATES_A = "select * from shoppingCarparkRate where carpark_id=? and range_start<=? and range_end>=? and tend_time > TIME(?)";
     // public static final String MYSQL_URL = "jdbc:mysql://localhost:3306/database";
     // public static final String MYSQL_USER = "root";
     // public static final String MYSQL_PASSWORD = "Sa84684663";
@@ -204,7 +204,7 @@ public class AppRepository {
 
     }
 
-    public List<ShoppingCarPark> getURAcarparkCostB(String carparkId, Integer dayOfWeekInt, String endTimeString) {
+    public List<ShoppingCarPark> getShoppingCarpark(String carparkId, Integer dayOfWeekInt, String startTimeString) {
         List<ShoppingCarPark> listOfShopCP = jdbcTemplate.query(GET_SHOPPING_RATES_A, new ResultSetExtractor<List<ShoppingCarPark>>() {
             @Override
             public List<ShoppingCarPark> extractData(ResultSet rs) throws SQLException {
@@ -215,8 +215,8 @@ public class AppRepository {
                     sCP.setAddress(rs.getString("address"));
                     sCP.setRange_start(rs.getInt("range_start"));
                     sCP.setRange_end(rs.getInt("range_end"));
-                    sCP.setStart_time(rs.getString("start_time"));
-                    sCP.setEnd_time(rs.getString("end_time"));
+                    sCP.setStart_time(rs.getString("tstart_time"));
+                    sCP.setEnd_time(rs.getString("tend_time"));
                     sCP.setMin1(rs.getString("min1"));
                     sCP.setRate1(rs.getString("rate1"));
                     sCP.setMin2(rs.getString("min2"));
@@ -234,7 +234,7 @@ public class AppRepository {
                     return listOfShoppingCP;
                 }
             }
-        }, carparkId, dayOfWeekInt, dayOfWeekInt, endTimeString);
+        }, carparkId, dayOfWeekInt, dayOfWeekInt, startTimeString);
 
         return listOfShopCP;
     }

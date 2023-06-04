@@ -149,28 +149,39 @@ public class AppServices {
 				// CarPark is HDB
 				if (Utils.isCarparkCentral(c.getCarParkId())) {
 					// CarPark is within central
-					try {
-						String cost = Utils.checkTimeForHDBRates(parkedTime, exitTime);
-						c.setCost(cost);
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-						
+					String cost = Utils.checkTimeForHDBRates(parkedTime, exitTime);
+					c.setCost(cost);
+					
 				} else {
-					// HDB outside central rates
-					try {
-						String roundedCost = Utils.getHDBRates(startTimeString, endTimeString, 0.60);
-						c.setCost(roundedCost);
-					} catch (ParseException e) {
-						e.getStackTrace();
-					}					
+					// HDB outside central rates					
+					String roundedCost = Utils.getHDBRates(startTimeString, endTimeString, 0.60);
+					c.setCost(roundedCost);
+									
 				}
 			} else if (Utils.isShopping(c.getCarParkId())) {	
 				// Shopping centers charges
 				Integer dayOfWeekInt = Utils.dayOfWeekInteger(dayOfWeekString);
+				double totalCost = 0;
 
-				List<ShoppingCarPark> listOfShoppingCP = appRepository.getURAcarparkCostB(c.getCarParkId(), dayOfWeekInt, endTimeString);
+				List<ShoppingCarPark> listOfShoppingCP = appRepository.getShoppingCarpark(c.getCarParkId(), dayOfWeekInt, startTimeString);
+
+				List<ShoppingCarPark> removedList = Utils.removeCarParks(listOfShoppingCP, endTimeString);
+
+				Long minutesDifference = Utils.getMinutes(startTimeString, endTimeString);
+
+				if (removedList.size() == 1) {
+					Double cost = Utils.getFirstShoppingCost(startTimeString, removedList.get(0));
+					c.setCost(Double.toString(cost));
+				} else if (removedList.size() == 2) {
+					Double cost1 = Utils.getFirstShoppingCost(startTimeString, removedList.get(0));
+					Double cost2 = Utils.getSecondShoppingCost(endTimeString, removedList.get(1));
+				}
+
+				for (int i = 0; i<removedList.size(); i++) {
+				
+				}
+
+
 
 
 			} else {
