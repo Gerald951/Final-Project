@@ -150,19 +150,16 @@ public class Utils {
 	}
 
 
-	public static String get24hDateFormat(String time) {
+	public static String get24hDateFormat(String time) throws ParseException {
 		String timeString = time;
         DateFormat inputFormat = new SimpleDateFormat("h.mm a");
         DateFormat outputFormat = new SimpleDateFormat("HH:mm:ss");
 
-        try {
-            Date date = inputFormat.parse(timeString);
-            String convertedTime = outputFormat.format(date);
-            return convertedTime;
-        } catch (ParseException e) {
-            e.printStackTrace();
-			return null;
-        }
+        
+		Date date = inputFormat.parse(timeString);
+		String convertedTime = outputFormat.format(date);
+		return convertedTime;
+        
 	}
 
 	public static Boolean isAfter(String tStart, String startTimeString) {
@@ -252,6 +249,25 @@ public class Utils {
 		}
 		
 
+	}
+
+	public static Integer dayOfWeekInteger(String dayOfWeek) {
+		switch (dayOfWeek) {
+			case "Mon":
+				return 1;
+			case "Tue":
+				return 2;
+			case "Wed":
+				return 3;
+			case "Thur":
+				return 4;
+			case "Fri":
+				return 5;
+			case "Sat":
+				return 6;
+			default:
+				return 7;
+		}
 	}
 
 	public static String toTwoDecimalPlaces(double cost) {

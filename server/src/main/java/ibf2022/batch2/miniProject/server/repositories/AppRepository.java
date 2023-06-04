@@ -1,14 +1,9 @@
 package ibf2022.batch2.miniProject.server.repositories;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -21,6 +16,7 @@ import ibf2022.batch2.miniProject.server.exceptions.CoordinatesException;
 import ibf2022.batch2.miniProject.server.exceptions.NearbyCarparkException;
 import ibf2022.batch2.miniProject.server.model.CarPark;
 import ibf2022.batch2.miniProject.server.model.Coordinates;
+import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
 import ibf2022.batch2.miniProject.server.model.URACarPark;
 
 @Repository
@@ -33,10 +29,11 @@ public class AppRepository {
                                                         + " from parkingLocation having distance_m < ? order by distance_m";
     public static final String GET_CARPARKS_ID = "select * from parkingLocation where address=?";
     public static final String GET_URA_RATES_A = "select * from URAcarpark where carpark_id=? and tstart_time < TIME(?)";
-    public static final String GET_URA_RATES_B = "select * from URAcarpark where carpark_id=? and tstart_time < TIME(?)";
-    public static final String MYSQL_URL = "jdbc:mysql://localhost:3306/database";
-    public static final String MYSQL_USER = "root";
-    public static final String MYSQL_PASSWORD = "Sa84684663";
+    public static final String GET_URA_RATES_B = "select * from URAcarpark where carpark_id=?";
+    public static final String GET_SHOPPING_RATES_A = "select * from shoppingCarparkRate where carpark_id=? and range_start<=? and range_end<=? and tstart_time < TIME(?)";
+    // public static final String MYSQL_URL = "jdbc:mysql://localhost:3306/database";
+    // public static final String MYSQL_USER = "root";
+    // public static final String MYSQL_PASSWORD = "Sa84684663";
 
 
     @Autowired
@@ -133,70 +130,113 @@ public class AppRepository {
         return listOfURAcp;
     }
 
-    public Map<String,String> getURAcarparkCostB(String carparkId, String timeNow) {
-
-        try {
-            Connection connection = DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
-
-            // Use ResultSet.TYPE_SCROLL_INSENSITIVE for a result set that allows resultSet to navigate in any direction
-            PreparedStatement statement = connection.prepareStatement(GET_URA_RATES_B, ResultSet.TYPE_SCROLL_INSENSITIVE);
-
-            // Set the parameters for the prepared statement
-            statement.setString(1, carparkId);
-            statement.setString(2, timeNow);
-
-            ResultSet resultSet = statement.executeQuery();
-
-            // Perform operations on the result set
-            resultSet.last();
-                if (resultSet.getString("weekday_min").equalsIgnoreCase("510 mins")) {
-                    resultSet.previous();
-                    Map<String, String> maps = new HashMap<>();
-                    maps.put("weekday_rate", resultSet.getString("weekday_rate"));
-                    maps.put("satday_rate", resultSet.getString("satday_rate"));
-                    maps.put("sunPH_rate", resultSet.getString("sunPH_rate"));
-
-                    // close the resources when you're done
-                    resultSet.close();
-                    statement.close();
-                    connection.close();
-
-                    return maps;
-                } else {
-                    Map<String, String> maps = new HashMap<>();
-                    maps.put("weekday_rate", Integer.toString(0));
-                    maps.put("satday_rate", Integer.toString(0));
-                    maps.put("sunPH_rate", Integer.toString(0));
-
-                    resultSet.close();
-                    statement.close();
-                    connection.close();
-
-                    return maps;
+    public List<URACarPark> getURAcarparkCostB(String carparkId) {
+        List<URACarPark> listOfURAcp = jdbcTemplate.query(GET_URA_RATES_B, new ResultSetExtractor<List<URACarPark>>() {
+            @Override
+            public List<URACarPark> extractData(ResultSet rs) throws SQLException {
+                List<URACarPark> listOfURAcarparks = new LinkedList<>();
+                while(rs.next()) {
+                    URACarPark uraCarPark = new URACarPark();
+                    uraCarPark.setWeekday_min(rs.getString("weekday_min"));
+                    uraCarPark.setWeekday_rate(rs.getString("weekday_rate"));
+                    uraCarPark.setSatday_rate(rs.getString("satday_rate"));
+                    uraCarPark.setSunPH_rate(rs.getString("sunPH_rate"));
+                    uraCarPark.setEnd_time(rs.getString("end_time"));
+                    uraCarPark.setStart_time(rs.getString("start_time"));
+                    listOfURAcarparks.add(uraCarPark);
                 }
-    
-        } catch (Exception e) {
-            e.getStackTrace();
-            return null;
-        }
-        
-        // Map<String, String> cost = jdbcTemplate.query(GET_URA_RATES_B, new ResultSetExtractor<Map<String, String>>() {
-        //     @Override
-        //     public Map<String, String> extractData(ResultSet rs) throws SQLException {
-        //         rs.last();
-        //         if (rs.getString("weekday_min").equalsIgnoreCase("510 mins")) {
-        //             rs.previous();
+
+                if (listOfURAcarparks.isEmpty()) {
+                    return null;
+                } else {
+                    return listOfURAcarparks;
+                }
+            }
+        }, carparkId);
+
+        return listOfURAcp;
+
+
+        // try {
+        //     Connection connection = DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
+
+        //     // Use ResultSet.TYPE_SCROLL_INSENSITIVE for a result set that allows resultSet to navigate in any direction
+        //     PreparedStatement statement = connection.prepareStatement(GET_URA_RATES_B, ResultSet.TYPE_SCROLL_INSENSITIVE);
+
+        //     // Set the parameters for the prepared statement
+        //     statement.setString(1, carparkId);
+        //     statement.setString(2, timeNow);
+
+        //     ResultSet resultSet = statement.executeQuery();
+
+        //     // Perform operations on the result set
+        //     resultSet.last();
+        //         if (resultSet.getString("weekday_min").equalsIgnoreCase("510 mins")) {
+        //             resultSet.previous();
         //             Map<String, String> maps = new HashMap<>();
-        //             maps.put("weekday", rs.getString("weekday_rate"));
-        //             maps.put("satday_rate", rs.getString("satday_rate"));
-        //             maps.put("sunPH_rate", rs.getString("sunPH_rate"));
+        //             maps.put("weekday_rate", resultSet.getString("weekday_rate"));
+        //             maps.put("satday_rate", resultSet.getString("satday_rate"));
+        //             maps.put("sunPH_rate", resultSet.getString("sunPH_rate"));
+
+        //             // close the resources when you're done
+        //             resultSet.close();
+        //             statement.close();
+        //             connection.close();
+
         //             return maps;
         //         } else {
-        //             return null;
-        //         }
-        //     }
-        // }, carparkId, timeNow);
+        //             Map<String, String> maps = new HashMap<>();
+        //             maps.put("weekday_rate", Integer.toString(0));
+        //             maps.put("satday_rate", Integer.toString(0));
+        //             maps.put("sunPH_rate", Integer.toString(0));
 
+        //             resultSet.close();
+        //             statement.close();
+        //             connection.close();
+
+        //             return maps;
+        //         }
+    
+        // } catch (Exception e) {
+        //     e.getStackTrace();
+        //     return null;
+        // }
+
+    }
+
+    public List<ShoppingCarPark> getURAcarparkCostB(String carparkId, Integer dayOfWeekInt, String endTimeString) {
+        List<ShoppingCarPark> listOfShopCP = jdbcTemplate.query(GET_SHOPPING_RATES_A, new ResultSetExtractor<List<ShoppingCarPark>>() {
+            @Override
+            public List<ShoppingCarPark> extractData(ResultSet rs) throws SQLException {
+                List<ShoppingCarPark> listOfShoppingCP = new LinkedList<>();
+                while(rs.next()) {
+                    ShoppingCarPark sCP = new ShoppingCarPark();
+                    sCP.setCarpark_id(rs.getString("carpark_id"));
+                    sCP.setAddress(rs.getString("address"));
+                    sCP.setRange_start(rs.getInt("range_start"));
+                    sCP.setRange_end(rs.getInt("range_end"));
+                    sCP.setStart_time(rs.getString("start_time"));
+                    sCP.setEnd_time(rs.getString("end_time"));
+                    sCP.setMin1(rs.getString("min1"));
+                    sCP.setRate1(rs.getString("rate1"));
+                    sCP.setMin2(rs.getString("min2"));
+                    sCP.setRate2(rs.getString("rate2"));
+                    sCP.setMin3(rs.getString("min3"));
+                    sCP.setRate3(rs.getString("rate3"));
+                    sCP.setMin4(rs.getString("min4"));
+                    sCP.setRate4(rs.getString("rate4"));
+                    listOfShoppingCP.add(sCP);
+                }
+
+                if (listOfShoppingCP.isEmpty()) {
+                    return null;
+                } else {
+                    return listOfShoppingCP;
+                }
+            }
+        }, carparkId, dayOfWeekInt, dayOfWeekInt, endTimeString);
+
+        return listOfShopCP;
     }
 
 

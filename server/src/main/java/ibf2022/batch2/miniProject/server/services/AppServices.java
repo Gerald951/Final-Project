@@ -18,6 +18,7 @@ import ibf2022.batch2.miniProject.server.exceptions.CoordinatesException;
 import ibf2022.batch2.miniProject.server.exceptions.NearbyCarparkException;
 import ibf2022.batch2.miniProject.server.model.CarPark;
 import ibf2022.batch2.miniProject.server.model.Coordinates;
+import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
 import ibf2022.batch2.miniProject.server.model.URACarPark;
 import ibf2022.batch2.miniProject.server.repositories.AppRepository;
 
@@ -165,8 +166,13 @@ public class AppServices {
 						e.getStackTrace();
 					}					
 				}
-			} else if (Utils.isShopping(c.getCarParkId())) {
+			} else if (Utils.isShopping(c.getCarParkId())) {	
 				// Shopping centers charges
+				Integer dayOfWeekInt = Utils.dayOfWeekInteger(dayOfWeekString);
+
+				List<ShoppingCarPark> listOfShoppingCP = appRepository.getURAcarparkCostB(c.getCarParkId(), dayOfWeekInt, endTimeString);
+
+
 			} else {
 				// URA charges
 				List<URACarPark> listOfURAcp = appRepository.checkURAcarparkA(c.getCarParkId(), endTimeString);
@@ -180,8 +186,12 @@ public class AppServices {
 						Boolean isOvernight = (listOfURAcp.get(listOfURAcp.size()-1).getWeekday_min().equalsIgnoreCase("510 mins"));
 						// check if there is overnight charging
 						if (isOvernight) {
+							if  (listOfURAcp.get(listOfURAcp.size()-1).getWeekday_min().equalsIgnoreCase("510 mins")) {
+								listOfURAcp.remove(listOfURAcp.size()-1);
+							}
+
 							for (int i = 0; i < listOfURAcp.size()-1; i++) {
-								if (i == listOfURAcp.size() - 2) {
+								if (i == listOfURAcp.size() - 1) {
 									Long secondsDifference = Utils.getSecondsA(listOfURAcp.get(i).getStart_time(), endTimeString);
 									String rate = null;
 									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
@@ -247,21 +257,25 @@ public class AppServices {
 							c.setCost(Double.toString(totalCost));
 						}
 					} else {
+						if  (listOfURAcp.get(listOfURAcp.size()-1).getWeekday_min().equalsIgnoreCase("510 mins")) {
+							listOfURAcp.remove(listOfURAcp.size()-1);
+						}
+
 						for (int i = 0; i<listOfURAcp.size(); i++) {
 							if (i == 0) {
 								Long secondsDifference = Utils.getSecondsC(startTimeString, listOfURAcp.get(i).getEnd_time());
 								String rate = null;
-									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate();
-										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate();
-										default:
-											rate = listOfURAcp.get(i).getWeekday_rate();
-									}
+								switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+									case "sunPH_rate":
+										rate = listOfURAcp.get(i).getSunPH_rate();
+									case "satday_rate":
+										rate = listOfURAcp.get(i).getSatday_rate();
+									default:
+										rate = listOfURAcp.get(i).getWeekday_rate();
+								}
 
-									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-									totalCost += cost;
+								Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+								totalCost += cost;
 							} else if (i == listOfURAcp.size()-1) {
 								Long secondsDifference = Utils.getSecondsA(listOfURAcp.get(i).getStart_time(), endTimeString);
 								String rate = null;
@@ -293,10 +307,169 @@ public class AppServices {
 							}
 						}
 						c.setCost(Double.toString(totalCost));
+							
 					}
 				
 				} else {
 					// NULL (parking done after 12am)
+					List<URACarPark> listOfURAcpB = appRepository.getURAcarparkCostB(c.getCarParkId());
+
+					if (listOfURAcpB != null) {
+						Boolean isOvernight = (listOfURAcpB.get(listOfURAcpB.size()-1).getWeekday_min()).equalsIgnoreCase("510 mins");
+
+						if (isOvernight) {
+							// Overnight charging
+							String tstart24hFormat = Utils.get24hDateFormat(listOfURAcpB.get(0).getStart_time());
+
+							if (Utils.isAfter(tstart24hFormat, startTimeString)) {
+								if  (listOfURAcpB.get(listOfURAcpB.size()-1).getWeekday_min().equalsIgnoreCase("510 mins")) {
+									listOfURAcpB.remove(listOfURAcpB.size()-1);
+								}
+								// tStart is after startTimeString
+								for (int i = 0; i < listOfURAcpB.size()-1; i++) {
+									if (i == listOfURAcpB.size() - 1) {
+										Long secondsDifference = Utils.getSecondsA(listOfURAcpB.get(i).getStart_time(), endTimeString);
+										String rate = null;
+										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+											case "sunPH_rate":
+												rate = listOfURAcpB.get(i).getSunPH_rate();
+											case "satday_rate":
+												rate = listOfURAcpB.get(i).getSatday_rate();
+											default:
+												rate = listOfURAcpB.get(i).getWeekday_rate();
+										}
+	
+										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+										totalCost += cost;
+									} else {
+										Long secondsDifference = Utils.getSecondsB(listOfURAcpB.get(i).getStart_time(), listOfURAcpB.get(i).getEnd_time());
+										String rate = null;
+										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+											case "sunPH_rate":
+												rate = listOfURAcpB.get(i).getSunPH_rate();
+											case "satday_rate":
+												rate = listOfURAcpB.get(i).getSatday_rate();
+											default:
+												rate = listOfURAcpB.get(i).getWeekday_rate();
+										}
+	
+										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+										totalCost += cost;
+									}
+								}
+								c.setCost(Double.toString(totalCost));
+
+							} else {
+								if  (listOfURAcpB.get(listOfURAcpB.size()-1).getWeekday_min().equalsIgnoreCase("510 mins")) {
+									listOfURAcpB.remove(listOfURAcpB.size()-1);
+								}
+
+								for (int i = 0; i<listOfURAcpB.size(); i++) {
+									if (i == 0) {
+										Long secondsDifference = Utils.getSecondsC(startTimeString, listOfURAcpB.get(i).getEnd_time());
+										String rate = null;
+											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+												case "sunPH_rate":
+													rate = listOfURAcpB.get(i).getSunPH_rate();
+												case "satday_rate":
+													rate = listOfURAcpB.get(i).getSatday_rate();
+												default:
+													rate = listOfURAcpB.get(i).getWeekday_rate();
+											}
+			
+											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+											totalCost += cost;
+									} else if (i == listOfURAcpB.size()-1) {
+										Long secondsDifference = Utils.getSecondsA(listOfURAcpB.get(i).getStart_time(), endTimeString);
+										String rate = null;
+											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+												case "sunPH_rate":
+													rate = listOfURAcpB.get(i).getSunPH_rate();
+												case "satday_rate":
+													rate = listOfURAcpB.get(i).getSatday_rate();
+												default:
+													rate = listOfURAcpB.get(i).getWeekday_rate();
+											}
+		
+											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+											totalCost += cost;
+									} else {
+										Long secondsDifference = Utils.getSecondsB(listOfURAcpB.get(i).getStart_time(), listOfURAcpB.get(i).getEnd_time());
+										String rate = null;
+										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+											case "sunPH_rate":
+												rate = listOfURAcpB.get(i).getSunPH_rate();
+											case "satday_rate":
+												rate = listOfURAcpB.get(i).getSatday_rate();
+											default:
+												rate = listOfURAcpB.get(i).getWeekday_rate();
+										}
+		
+										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+										totalCost += cost;
+									}
+								}
+								c.setCost(Double.toString(totalCost));
+
+							}
+						} else {
+							String tstart24hFormat = Utils.get24hDateFormat(listOfURAcpB.get(0).getStart_time());
+
+							if (Utils.isAfter(tstart24hFormat, startTimeString)) {
+								for (int i = 0; i<listOfURAcpB.size(); i++) {
+									Long secondsDifference = Utils.getSecondsB(listOfURAcpB.get(i).getStart_time(), listOfURAcpB.get(i).getEnd_time());
+									String rate = null;
+									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+										case "sunPH_rate":
+											rate = listOfURAcpB.get(i).getSunPH_rate();
+										case "satday_rate":
+											rate = listOfURAcpB.get(i).getSatday_rate();
+										default:
+											rate = listOfURAcpB.get(i).getWeekday_rate();
+									}
+	
+									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+									totalCost += cost;
+								}
+								c.setCost(Double.toString(totalCost));
+							} else {
+								for (int i = 0; i<listOfURAcpB.size(); i++) {
+									if (i == 0) {
+										Long secondsDifference = Utils.getSecondsC(startTimeString, listOfURAcpB.get(i).getEnd_time());
+										String rate = null;
+											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+												case "sunPH_rate":
+													rate = listOfURAcpB.get(i).getSunPH_rate();
+												case "satday_rate":
+													rate = listOfURAcpB.get(i).getSatday_rate();
+												default:
+													rate = listOfURAcpB.get(i).getWeekday_rate();
+											}
+			
+											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+											totalCost += cost;
+									} else {
+										Long secondsDifference = Utils.getSecondsB(listOfURAcpB.get(i).getStart_time(), listOfURAcpB.get(i).getEnd_time());
+										String rate = null;
+										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
+											case "sunPH_rate":
+												rate = listOfURAcpB.get(i).getSunPH_rate();
+											case "satday_rate":
+												rate = listOfURAcpB.get(i).getSatday_rate();
+											default:
+												rate = listOfURAcpB.get(i).getWeekday_rate();
+										}
+
+										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+										totalCost += cost;
+									}
+								}
+								c.setCost(Double.toString(totalCost));
+							}
+						}
+					} else {
+						c.setCost("No Data");
+					}
 				}
 			}
 		}
