@@ -71,7 +71,7 @@ public class AppRepository {
                     carPark.setAddress(rs.getString("address"));
                     carPark.setLatitude(Double.toString(rs.getDouble("latitude")));
                     carPark.setLongitude(Double.toString(rs.getDouble("longitude")));
-                    carPark.setDistance(rs.getDouble("distance_m"));
+                    carPark.setDistance((int) Math.ceil(rs.getDouble("distance_m")));
                     listOfCarParks.add(carPark);
                 }
 
@@ -155,52 +155,6 @@ public class AppRepository {
         }, carparkId);
 
         return listOfURAcp;
-
-
-        // try {
-        //     Connection connection = DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
-
-        //     // Use ResultSet.TYPE_SCROLL_INSENSITIVE for a result set that allows resultSet to navigate in any direction
-        //     PreparedStatement statement = connection.prepareStatement(GET_URA_RATES_B, ResultSet.TYPE_SCROLL_INSENSITIVE);
-
-        //     // Set the parameters for the prepared statement
-        //     statement.setString(1, carparkId);
-        //     statement.setString(2, timeNow);
-
-        //     ResultSet resultSet = statement.executeQuery();
-
-        //     // Perform operations on the result set
-        //     resultSet.last();
-        //         if (resultSet.getString("weekday_min").equalsIgnoreCase("510 mins")) {
-        //             resultSet.previous();
-        //             Map<String, String> maps = new HashMap<>();
-        //             maps.put("weekday_rate", resultSet.getString("weekday_rate"));
-        //             maps.put("satday_rate", resultSet.getString("satday_rate"));
-        //             maps.put("sunPH_rate", resultSet.getString("sunPH_rate"));
-
-        //             // close the resources when you're done
-        //             resultSet.close();
-        //             statement.close();
-        //             connection.close();
-
-        //             return maps;
-        //         } else {
-        //             Map<String, String> maps = new HashMap<>();
-        //             maps.put("weekday_rate", Integer.toString(0));
-        //             maps.put("satday_rate", Integer.toString(0));
-        //             maps.put("sunPH_rate", Integer.toString(0));
-
-        //             resultSet.close();
-        //             statement.close();
-        //             connection.close();
-
-        //             return maps;
-        //         }
-    
-        // } catch (Exception e) {
-        //     e.getStackTrace();
-        //     return null;
-        // }
 
     }
 

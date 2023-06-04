@@ -167,22 +167,30 @@ public class AppServices {
 
 				List<ShoppingCarPark> removedList = Utils.removeCarParks(listOfShoppingCP, endTimeString);
 
-				Long minutesDifference = Utils.getMinutes(startTimeString, endTimeString);
-
 				if (removedList.size() == 1) {
 					Double cost = Utils.getFirstShoppingCost(startTimeString, removedList.get(0));
 					c.setCost(Double.toString(cost));
 				} else if (removedList.size() == 2) {
 					Double cost1 = Utils.getFirstShoppingCost(startTimeString, removedList.get(0));
 					Double cost2 = Utils.getSecondShoppingCost(endTimeString, removedList.get(1));
+					c.setCost(Double.toString(cost1 + cost2));
+				} else {
+					
+					for (int i = 0; i<removedList.size(); i++) {
+						if (i==0) {
+							Double cost1 = Utils.getFirstShoppingCost(startTimeString, removedList.get(0));
+							totalCost += cost1;
+						} else if (i==removedList.size()-1) {
+							Double cost2 = Utils.getSecondShoppingCost(endTimeString, removedList.get(removedList.size()-1));
+							totalCost += cost2;
+						} else {
+							Double cost3 = Utils.getThirdShoppingCost(removedList.get(i));
+							totalCost += cost3;
+						}
+					}
+
+					c.setCost(Utils.toTwoDecimalPlaces(totalCost));
 				}
-
-				for (int i = 0; i<removedList.size(); i++) {
-				
-				}
-
-
-
 
 			} else {
 				// URA charges
@@ -207,11 +215,11 @@ public class AppServices {
 									String rate = null;
 									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate();
+											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
 										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate();
+											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
 										default:
-											rate = listOfURAcp.get(i).getWeekday_rate();
+											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
 									}
 
 									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -221,11 +229,11 @@ public class AppServices {
 									String rate = null;
 									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate();
+											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
 										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate();
+											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
 										default:
-											rate = listOfURAcp.get(i).getWeekday_rate();
+											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
 									}
 
 									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -240,11 +248,11 @@ public class AppServices {
 									String rate = null;
 									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate();
+											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
 										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate();
+											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
 										default:
-											rate = listOfURAcp.get(i).getWeekday_rate();
+											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
 									}
 
 									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -254,11 +262,11 @@ public class AppServices {
 									String rate = null;
 									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate();
+											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
 										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate();
+											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
 										default:
-											rate = listOfURAcp.get(i).getWeekday_rate();
+											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
 									}
 
 									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -278,25 +286,26 @@ public class AppServices {
 								String rate = null;
 								switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 									case "sunPH_rate":
-										rate = listOfURAcp.get(i).getSunPH_rate();
+										rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
+										
 									case "satday_rate":
-										rate = listOfURAcp.get(i).getSatday_rate();
+										rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
 									default:
-										rate = listOfURAcp.get(i).getWeekday_rate();
+										rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
 								}
 
-								Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
+								Double cost = secondsDifference*(Double.parseDouble(rate))/30/60;
 								totalCost += cost;
 							} else if (i == listOfURAcp.size()-1) {
 								Long secondsDifference = Utils.getSecondsA(listOfURAcp.get(i).getStart_time(), endTimeString);
 								String rate = null;
 									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate();
+											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
 										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate();
+											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
 										default:
-											rate = listOfURAcp.get(i).getWeekday_rate();
+											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
 									}
 
 									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -306,11 +315,11 @@ public class AppServices {
 								String rate = null;
 								switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 									case "sunPH_rate":
-										rate = listOfURAcp.get(i).getSunPH_rate();
+										rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
 									case "satday_rate":
-										rate = listOfURAcp.get(i).getSatday_rate();
+										rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
 									default:
-										rate = listOfURAcp.get(i).getWeekday_rate();
+										rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
 								}
 
 								Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -343,11 +352,11 @@ public class AppServices {
 										String rate = null;
 										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 											case "sunPH_rate":
-												rate = listOfURAcpB.get(i).getSunPH_rate();
+												rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
 											case "satday_rate":
-												rate = listOfURAcpB.get(i).getSatday_rate();
+												rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
 											default:
-												rate = listOfURAcpB.get(i).getWeekday_rate();
+												rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
 										}
 	
 										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -357,11 +366,11 @@ public class AppServices {
 										String rate = null;
 										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 											case "sunPH_rate":
-												rate = listOfURAcpB.get(i).getSunPH_rate();
+												rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
 											case "satday_rate":
-												rate = listOfURAcpB.get(i).getSatday_rate();
+												rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
 											default:
-												rate = listOfURAcpB.get(i).getWeekday_rate();
+												rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
 										}
 	
 										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -381,11 +390,11 @@ public class AppServices {
 										String rate = null;
 											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 												case "sunPH_rate":
-													rate = listOfURAcpB.get(i).getSunPH_rate();
+													rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
 												case "satday_rate":
-													rate = listOfURAcpB.get(i).getSatday_rate();
+													rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
 												default:
-													rate = listOfURAcpB.get(i).getWeekday_rate();
+													rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
 											}
 			
 											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -395,11 +404,11 @@ public class AppServices {
 										String rate = null;
 											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 												case "sunPH_rate":
-													rate = listOfURAcpB.get(i).getSunPH_rate();
+													rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
 												case "satday_rate":
-													rate = listOfURAcpB.get(i).getSatday_rate();
+													rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
 												default:
-													rate = listOfURAcpB.get(i).getWeekday_rate();
+													rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
 											}
 		
 											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -409,11 +418,11 @@ public class AppServices {
 										String rate = null;
 										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 											case "sunPH_rate":
-												rate = listOfURAcpB.get(i).getSunPH_rate();
+												rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
 											case "satday_rate":
-												rate = listOfURAcpB.get(i).getSatday_rate();
+												rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
 											default:
-												rate = listOfURAcpB.get(i).getWeekday_rate();
+												rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
 										}
 		
 										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -432,11 +441,11 @@ public class AppServices {
 									String rate = null;
 									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 										case "sunPH_rate":
-											rate = listOfURAcpB.get(i).getSunPH_rate();
+											rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
 										case "satday_rate":
-											rate = listOfURAcpB.get(i).getSatday_rate();
+											rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
 										default:
-											rate = listOfURAcpB.get(i).getWeekday_rate();
+											rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
 									}
 	
 									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -450,11 +459,11 @@ public class AppServices {
 										String rate = null;
 											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 												case "sunPH_rate":
-													rate = listOfURAcpB.get(i).getSunPH_rate();
+													rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
 												case "satday_rate":
-													rate = listOfURAcpB.get(i).getSatday_rate();
+													rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
 												default:
-													rate = listOfURAcpB.get(i).getWeekday_rate();
+													rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
 											}
 			
 											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
@@ -464,11 +473,11 @@ public class AppServices {
 										String rate = null;
 										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
 											case "sunPH_rate":
-												rate = listOfURAcpB.get(i).getSunPH_rate();
+												rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
 											case "satday_rate":
-												rate = listOfURAcpB.get(i).getSatday_rate();
+												rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
 											default:
-												rate = listOfURAcpB.get(i).getWeekday_rate();
+												rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
 										}
 
 										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;

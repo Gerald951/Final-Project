@@ -6,7 +6,7 @@ public class CarPark {
     private String address;
     private String latitude;
     private String longitude;
-    private Double distance;
+    private Integer distance;
     private String cost;
     private String lotsAvailable;
 
@@ -34,12 +34,6 @@ public class CarPark {
     public void setLongitude(String longitude) {
         this.longitude = longitude;
     }
-    public Double getDistance() {
-        return distance;
-    }
-    public void setDistance(Double distance) {
-        this.distance = distance;
-    }
 
     @Override
     public String toString() {
@@ -57,6 +51,12 @@ public class CarPark {
     }
     public void setLotsAvailable(String lotsAvailable) {
         this.lotsAvailable = lotsAvailable;
+    }
+    public Integer getDistance() {
+        return distance;
+    }
+    public void setDistance(Integer distance) {
+        this.distance = distance;
     }
 
     
