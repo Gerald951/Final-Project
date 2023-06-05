@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 import com.opencsv.CSVReader;
 
 import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
-import ibf2022.batch2.miniProject.server.model.URACarPark;
 
 public class Utils {
     
@@ -235,33 +234,6 @@ public class Utils {
 		return minutesDifference;
 	}
 
-	public static Integer getMultiplier(Long minutes, Integer divider) {
-		Integer multiplier = (int) (minutes/divider);
-
-		if (minutes%divider > 0) {
-			multiplier++;
-		}
-
-		return multiplier;
-	}
-
-	public static Double getURACost(URACarPark cp, Integer multiplier, String weekDayString) {
-		switch (weekDayString) {
-			case "sunPH_rate":
-				String costSun = cp.getSunPH_rate().substring(1, 5);
-				Double rateSun = Double.parseDouble(costSun);
-				return rateSun*multiplier;
-			case "satday_rate":
-				String costSat = cp.getSatday_rate().substring(1, 5);
-				Double rateSat = Double.parseDouble(costSat);
-				return rateSat*multiplier;
-			default:
-				String costWeekDay = cp.getWeekday_rate().substring(1, 5);
-				Double rateWeekDay = Double.parseDouble(costWeekDay);
-				return rateWeekDay*multiplier;
-		}
-	}
-
 	public static List<String> getListOfMin(ShoppingCarPark sCP) {
 		List<String> listOfMin  = new LinkedList<>();
 		listOfMin.add(sCP.getMin1());
@@ -366,17 +338,6 @@ public class Utils {
 			}
 
 			return cost;
-		}
-	}
-
-	public static String getRateBasedOnDay(String dayOfWeek) {
-		switch (dayOfWeek) {
-			case "Sun":
-				return("sunPH_rate");
-			case "Sat":
-				return("satday_rate");
-			default:
-				return("weekday_rate");
 		}
 	}
 
