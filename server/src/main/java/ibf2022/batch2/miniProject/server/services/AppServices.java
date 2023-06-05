@@ -19,7 +19,6 @@ import ibf2022.batch2.miniProject.server.exceptions.NearbyCarparkException;
 import ibf2022.batch2.miniProject.server.model.CarPark;
 import ibf2022.batch2.miniProject.server.model.Coordinates;
 import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
-import ibf2022.batch2.miniProject.server.model.URACarPark;
 import ibf2022.batch2.miniProject.server.repositories.AppRepository;
 
 @Service
@@ -34,6 +33,7 @@ public class AppServices {
     public Integer getLotAvailability(String shoppingCenter) {
 		
         Integer shoppingCenterID = Utils.getMapOfLocationId().get(shoppingCenter);
+		System.out.println(shoppingCenter);
 
 		try {
 			URL obj = new URL(shoppingCenters_URL);
@@ -117,16 +117,19 @@ public class AppServices {
 		}
     }
 
-    public List<CarPark> getNearbyCarParks(String destination, Integer distance, String parkedTime, String exitTime, String dayOfWeek) throws CoordinatesException, NearbyCarparkException, ParseException {
+    public List<CarPark> getNearbyCarParks(String destination, Integer distance, List<String> parkedTime, List<String> exitTime, List<String> dayOfWeek) throws CoordinatesException, NearbyCarparkException, ParseException {
 		Coordinates coord = appRepository.getCoordinates(destination);
 		List<CarPark> listOfCarParks = appRepository.getNearbyCarparks(coord, distance);
+		System.out.println(listOfCarParks);
 
 		// Get Lot Availability
 		for (CarPark c : listOfCarParks) {
 			String input;
 			if (Utils.isShopping(c.getCarParkId())) {
+				
 				input = Integer.toString(getLotAvailability(c.getAddress().trim()));
 			} else {
+				
 				input = getCarParkLotAvailability(c.getAddress());
 			}
 			
@@ -139,9 +142,9 @@ public class AppServices {
 		}
 
 		// in 24h format
-		String startTimeString = parkedTime;
-		String endTimeString = exitTime;
-		String dayOfWeekString = dayOfWeek;
+		List<String> startTimeString = parkedTime;
+		List<String> endTimeString = exitTime;
+		List<String> dayOfWeekString = dayOfWeek;
 
 		// Get Total Rates
 		for (CarPark c : listOfCarParks) {
@@ -149,348 +152,50 @@ public class AppServices {
 				// CarPark is HDB
 				if (Utils.isCarparkCentral(c.getCarParkId())) {
 					// CarPark is within central
-					String cost = Utils.checkTimeForHDBRates(parkedTime, exitTime);
-					c.setCost(cost);
+					Double totalCost = 0.0;
+					for (int i = 0; i<startTimeString.size(); i++) {
+						totalCost += Utils.checkTimeForHDBRates(startTimeString.get(i), endTimeString.get(i), dayOfWeekString.get(i));
+					}
+					
+					c.setCost(Utils.toTwoDecimalPlaces(totalCost));
 					
 				} else {
-					// HDB outside central rates					
-					String roundedCost = Utils.getHDBRates(startTimeString, endTimeString, 0.60);
-					c.setCost(roundedCost);
+					// HDB outside central rates
+					Double totalCost = 0.0;
+
+					for (int i = 0; i<startTimeString.size(); i++) {
+						totalCost += Utils.getHDBRates(startTimeString.get(i), endTimeString.get(i), 0.60);
+					}
+					
+					c.setCost(Utils.toTwoDecimalPlaces(totalCost));
 									
 				}
 			} else if (Utils.isShopping(c.getCarParkId())) {	
 				// Shopping centers charges
-				Integer dayOfWeekInt = Utils.dayOfWeekInteger(dayOfWeekString);
-				double totalCost = 0;
+				Double totalCost = 0.0;
+				for (int i = 0; i<startTimeString.size(); i++) {
+					if (i==0) {
+						Integer dayOfWeekInt = Utils.dayOfWeekInteger(dayOfWeekString.get(i));
 
-				List<ShoppingCarPark> listOfShoppingCP = appRepository.getShoppingCarpark(c.getCarParkId(), dayOfWeekInt, startTimeString);
+						List<ShoppingCarPark> listOfShoppingCP = appRepository.getShoppingCarparkA(c.getCarParkId(), dayOfWeekInt, startTimeString.get(i));
 
-				List<ShoppingCarPark> removedList = Utils.removeCarParks(listOfShoppingCP, endTimeString);
+						Double cost = Utils.getTotalShoppingCostA(listOfShoppingCP, startTimeString.get(i), endTimeString.get(i));
+						totalCost += cost;
+					} else {
+						Integer dayOfWeekInt = Utils.dayOfWeekInteger(dayOfWeekString.get(i));
 
-				if (removedList.size() == 1) {
-					Double cost = Utils.getFirstShoppingCost(startTimeString, removedList.get(0));
-					c.setCost(Double.toString(cost));
-				} else if (removedList.size() == 2) {
-					Double cost1 = Utils.getFirstShoppingCost(startTimeString, removedList.get(0));
-					Double cost2 = Utils.getSecondShoppingCost(endTimeString, removedList.get(1));
-					c.setCost(Double.toString(cost1 + cost2));
-				} else {
-					
-					for (int i = 0; i<removedList.size(); i++) {
-						if (i==0) {
-							Double cost1 = Utils.getFirstShoppingCost(startTimeString, removedList.get(0));
-							totalCost += cost1;
-						} else if (i==removedList.size()-1) {
-							Double cost2 = Utils.getSecondShoppingCost(endTimeString, removedList.get(removedList.size()-1));
-							totalCost += cost2;
-						} else {
-							Double cost3 = Utils.getThirdShoppingCost(removedList.get(i));
-							totalCost += cost3;
-						}
+						List<ShoppingCarPark> listOfShoppingCPB = appRepository.getShoppingCarparkB(c.getCarParkId(), dayOfWeekInt, endTimeString.get(i));
+
+						Double cost = Utils.getTotalShoppingCostB(listOfShoppingCPB, startTimeString.get(i), endTimeString.get(i));
+						totalCost += cost;
 					}
-
-					c.setCost(Utils.toTwoDecimalPlaces(totalCost));
 				}
 
+				c.setCost(Utils.toTwoDecimalPlaces(totalCost));
+			
 			} else {
-				// URA charges
-				List<URACarPark> listOfURAcp = appRepository.checkURAcarparkA(c.getCarParkId(), endTimeString);
-				double totalCost = 0;
-
-				if (listOfURAcp != null) {
-					String tStart24hFormat = Utils.get24hDateFormat(listOfURAcp.get(0).getStart_time());
-					
-					// check if tstart(cp start time) is after startTime
-					if (Utils.isAfter(tStart24hFormat, startTimeString)) {
-						Boolean isOvernight = (listOfURAcp.get(listOfURAcp.size()-1).getWeekday_min().equalsIgnoreCase("510 mins"));
-						// check if there is overnight charging
-						if (isOvernight) {
-							if  (listOfURAcp.get(listOfURAcp.size()-1).getWeekday_min().equalsIgnoreCase("510 mins")) {
-								listOfURAcp.remove(listOfURAcp.size()-1);
-							}
-
-							for (int i = 0; i < listOfURAcp.size()-1; i++) {
-								if (i == listOfURAcp.size() - 1) {
-									Long secondsDifference = Utils.getSecondsA(listOfURAcp.get(i).getStart_time(), endTimeString);
-									String rate = null;
-									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
-										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
-										default:
-											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
-									}
-
-									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-									totalCost += cost;
-								} else {
-									Long secondsDifference = Utils.getSecondsB(listOfURAcp.get(i).getStart_time(), listOfURAcp.get(i).getEnd_time());
-									String rate = null;
-									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
-										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
-										default:
-											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
-									}
-
-									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-									totalCost += cost;
-								}
-							}
-							c.setCost(Double.toString(totalCost));
-						} else {
-							for (int i = 0; i<listOfURAcp.size(); i++) {
-								if (i == listOfURAcp.size()-1) {
-									Long secondsDifference = Utils.getSecondsA(listOfURAcp.get(i).getStart_time(), endTimeString);
-									String rate = null;
-									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
-										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
-										default:
-											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
-									}
-
-									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-									totalCost += cost;
-								} else {
-									Long secondsDifference = Utils.getSecondsB(listOfURAcp.get(i).getStart_time(), listOfURAcp.get(i).getEnd_time());
-									String rate = null;
-									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
-										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
-										default:
-											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
-									}
-
-									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-									totalCost += cost;
-								}
-							}
-							c.setCost(Double.toString(totalCost));
-						}
-					} else {
-						if  (listOfURAcp.get(listOfURAcp.size()-1).getWeekday_min().equalsIgnoreCase("510 mins")) {
-							listOfURAcp.remove(listOfURAcp.size()-1);
-						}
-
-						for (int i = 0; i<listOfURAcp.size(); i++) {
-							if (i == 0) {
-								Long secondsDifference = Utils.getSecondsC(startTimeString, listOfURAcp.get(i).getEnd_time());
-								String rate = null;
-								switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-									case "sunPH_rate":
-										rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
-										
-									case "satday_rate":
-										rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
-									default:
-										rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
-								}
-
-								Double cost = secondsDifference*(Double.parseDouble(rate))/30/60;
-								totalCost += cost;
-							} else if (i == listOfURAcp.size()-1) {
-								Long secondsDifference = Utils.getSecondsA(listOfURAcp.get(i).getStart_time(), endTimeString);
-								String rate = null;
-									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-										case "sunPH_rate":
-											rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
-										case "satday_rate":
-											rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
-										default:
-											rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
-									}
-
-									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-									totalCost += cost;
-							} else {
-								Long secondsDifference = Utils.getSecondsB(listOfURAcp.get(i).getStart_time(), listOfURAcp.get(i).getEnd_time());
-								String rate = null;
-								switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-									case "sunPH_rate":
-										rate = listOfURAcp.get(i).getSunPH_rate().substring(1, 5);
-									case "satday_rate":
-										rate = listOfURAcp.get(i).getSatday_rate().substring(1, 5);
-									default:
-										rate = listOfURAcp.get(i).getWeekday_rate().substring(1, 5);
-								}
-
-								Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-								totalCost += cost;
-							}
-						}
-						c.setCost(Double.toString(totalCost));
-							
-					}
 				
-				} else {
-					// NULL (parking done after 12am)
-					List<URACarPark> listOfURAcpB = appRepository.getURAcarparkCostB(c.getCarParkId());
-
-					if (listOfURAcpB != null) {
-						Boolean isOvernight = (listOfURAcpB.get(listOfURAcpB.size()-1).getWeekday_min()).equalsIgnoreCase("510 mins");
-
-						if (isOvernight) {
-							// Overnight charging
-							String tstart24hFormat = Utils.get24hDateFormat(listOfURAcpB.get(0).getStart_time());
-
-							if (Utils.isAfter(tstart24hFormat, startTimeString)) {
-								if  (listOfURAcpB.get(listOfURAcpB.size()-1).getWeekday_min().equalsIgnoreCase("510 mins")) {
-									listOfURAcpB.remove(listOfURAcpB.size()-1);
-								}
-								// tStart is after startTimeString
-								for (int i = 0; i < listOfURAcpB.size()-1; i++) {
-									if (i == listOfURAcpB.size() - 1) {
-										Long secondsDifference = Utils.getSecondsA(listOfURAcpB.get(i).getStart_time(), endTimeString);
-										String rate = null;
-										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-											case "sunPH_rate":
-												rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
-											case "satday_rate":
-												rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
-											default:
-												rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
-										}
-	
-										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-										totalCost += cost;
-									} else {
-										Long secondsDifference = Utils.getSecondsB(listOfURAcpB.get(i).getStart_time(), listOfURAcpB.get(i).getEnd_time());
-										String rate = null;
-										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-											case "sunPH_rate":
-												rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
-											case "satday_rate":
-												rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
-											default:
-												rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
-										}
-	
-										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-										totalCost += cost;
-									}
-								}
-								c.setCost(Double.toString(totalCost));
-
-							} else {
-								if  (listOfURAcpB.get(listOfURAcpB.size()-1).getWeekday_min().equalsIgnoreCase("510 mins")) {
-									listOfURAcpB.remove(listOfURAcpB.size()-1);
-								}
-
-								for (int i = 0; i<listOfURAcpB.size(); i++) {
-									if (i == 0) {
-										Long secondsDifference = Utils.getSecondsC(startTimeString, listOfURAcpB.get(i).getEnd_time());
-										String rate = null;
-											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-												case "sunPH_rate":
-													rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
-												case "satday_rate":
-													rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
-												default:
-													rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
-											}
-			
-											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-											totalCost += cost;
-									} else if (i == listOfURAcpB.size()-1) {
-										Long secondsDifference = Utils.getSecondsA(listOfURAcpB.get(i).getStart_time(), endTimeString);
-										String rate = null;
-											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-												case "sunPH_rate":
-													rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
-												case "satday_rate":
-													rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
-												default:
-													rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
-											}
-		
-											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-											totalCost += cost;
-									} else {
-										Long secondsDifference = Utils.getSecondsB(listOfURAcpB.get(i).getStart_time(), listOfURAcpB.get(i).getEnd_time());
-										String rate = null;
-										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-											case "sunPH_rate":
-												rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
-											case "satday_rate":
-												rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
-											default:
-												rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
-										}
-		
-										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-										totalCost += cost;
-									}
-								}
-								c.setCost(Double.toString(totalCost));
-
-							}
-						} else {
-							String tstart24hFormat = Utils.get24hDateFormat(listOfURAcpB.get(0).getStart_time());
-
-							if (Utils.isAfter(tstart24hFormat, startTimeString)) {
-								for (int i = 0; i<listOfURAcpB.size(); i++) {
-									Long secondsDifference = Utils.getSecondsB(listOfURAcpB.get(i).getStart_time(), listOfURAcpB.get(i).getEnd_time());
-									String rate = null;
-									switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-										case "sunPH_rate":
-											rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
-										case "satday_rate":
-											rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
-										default:
-											rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
-									}
-	
-									Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-									totalCost += cost;
-								}
-								c.setCost(Double.toString(totalCost));
-							} else {
-								for (int i = 0; i<listOfURAcpB.size(); i++) {
-									if (i == 0) {
-										Long secondsDifference = Utils.getSecondsC(startTimeString, listOfURAcpB.get(i).getEnd_time());
-										String rate = null;
-											switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-												case "sunPH_rate":
-													rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
-												case "satday_rate":
-													rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
-												default:
-													rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
-											}
-			
-											Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-											totalCost += cost;
-									} else {
-										Long secondsDifference = Utils.getSecondsB(listOfURAcpB.get(i).getStart_time(), listOfURAcpB.get(i).getEnd_time());
-										String rate = null;
-										switch (Utils.getRateBasedOnDay(dayOfWeekString)) {
-											case "sunPH_rate":
-												rate = listOfURAcpB.get(i).getSunPH_rate().substring(1, 5);
-											case "satday_rate":
-												rate = listOfURAcpB.get(i).getSatday_rate().substring(1, 5);
-											default:
-												rate = listOfURAcpB.get(i).getWeekday_rate().substring(1, 5);
-										}
-
-										Double cost = secondsDifference*Double.parseDouble(rate)/30/60;
-										totalCost += cost;
-									}
-								}
-								c.setCost(Double.toString(totalCost));
-							}
-						}
-					} else {
-						c.setCost("No Data");
-					}
-				}
+				c.setCost("No Data");
 			}
 		}
 

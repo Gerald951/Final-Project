@@ -9,7 +9,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,15 +22,16 @@ import java.util.concurrent.TimeUnit;
 import com.opencsv.CSVReader;
 
 import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
+import ibf2022.batch2.miniProject.server.model.URACarPark;
 
 public class Utils {
     
     public final static String[] carParksWithinCentral = {"ACB", "BBB", "BRB1", "CY", "DUXM", "HLM", "KAB", "KAM", "KAS", "PRM", "SLS", "SR1", "SR2", "TPM", "UCS", "WCB"};
 	public final static String[] shoppingCenters = {"Harbourfront Centre", "Resorts World Sentosa", "VivoCity P2", "VivoCity P3", "Sentosa", "Westgate", "IMM Building", "JCube", "National Gallery", "Singapore Flyer", 
 													"Millenia Singapore", "The Esplanade", "Raffles City", "Marina Square", "Suntec City", "Marina Bay Sands", "Centrepoint", "Cineleisure", "Orchard Point", "Concorde Hotel", "Plaza Singapura",
-													"The Cathay", "Mandarin Hotel", "Wisma Atria", "The Heeren", "Ngee Ann City", "Orchard Central", "ION Orchard", "Wheelock Place", "Orchard Gateway", "Tang Plaza", "Far East Plaza", "Paragon",
+													"The Cathay", "Mandarin Hotel", "Wisma Atria", "The Heeren", "Ngee Ann City", "Orchard Central", "Wheelock Place", "Orchard Gateway", "Tang Plaza", "Far East Plaza", "Paragon",
 													"313@Somerset", "The Atrium@Orchard", "Bukit Panjang Plaza", "Clarke Quay", "The Star Vista", "Funan Mall", "Lot One", "Tampines Mall", "Junction 8", "Bedok Mall", "Bugis+"};
-	public final static Integer[] shoppingCenters_ID = {19,26,50,16,17,43,53,54,56,6,5,4,3,2,1,29,21,11,7,22,9,10,12,14,8,13,27,23,15,52,18,20,55,24,57,58,59,60,66,62,63,64,65,61};
+	public final static Integer[] shoppingCenters_ID = {19,26,50,16,17,43,53,54,56,6,5,4,3,2,1,29,21,11,7,22,9,10,12,14,8,13,27,15,52,18,20,55,24,57,58,59,60,66,62,63,64,65,61};
 	public final static String[] shoppingCenters_rates = {"Harbourfront Centre", "Resorts World Sentosa RWS", "VivoCity P2", "VivoCity P3", "Sentosa", "Westgate", "IMM Building", "JCube", "National Gallery", "Singapore Flyer", 
 													"Millenia Walk", "The Esplanade", "Raffles City", "Marina Square", "Suntec City", "Marina Bay Sands MBS", "Centrepoint", "Cineleisure Orchard", "Orchard Point", "Concorde Hotel", "Plaza Singapura",
 													"The Cathay", "Mandarin Hotel", "Wisma Atria", "The Heeren", "Ngee Ann City Takashimaya", "Orchard Central", "ION Orchard", "Wheelock Place", "Orchard Gateway", "Tang Plaza", "Far East Plaza", "Paragon",
@@ -103,10 +103,7 @@ public class Utils {
 		return b;
 	}
 
-	public static String checkTimeForHDBRates(String startTime, String endTime) throws ParseException {
-		//define the day
-		LocalTime currTime = LocalTime.now();
-		DayOfWeek day = DayOfWeek.from(currTime);
+	public static Double checkTimeForHDBRates(String startTime, String endTime, String dayOfWeek) throws ParseException {
 
 		//define the parking start and end times
 		LocalTime start = LocalTime.parse(startTime);
@@ -116,40 +113,46 @@ public class Utils {
 		LocalTime carParkStart = LocalTime.of(7, 0, 0);
 		LocalTime carParkEnd = LocalTime.of(17,0,0);
 
-		if (carParkStart.isBefore(start) && carParkEnd.isAfter(end) && day!=DayOfWeek.SUNDAY) {
+		if (carParkStart.isBefore(start) && carParkEnd.isAfter(end) && !dayOfWeek.equalsIgnoreCase("Sun")) {
 			return getHDBRates(startTime, endTime, 1.20);
-		} else if (carParkStart.isBefore(start) && carParkEnd.isBefore(end) && day!=DayOfWeek.SUNDAY) {
-			return toTwoDecimalPlaces(getIntermediateRates(startTime, "17:00:00", 1.20) 
-					+ getIntermediateRates("17:00:00", endTime, 0.60));
+		} else if (carParkStart.isBefore(start) && carParkEnd.isBefore(end) && !dayOfWeek.equalsIgnoreCase("Sun")) {
+			
+				return getHDBRates(startTime, "17:00:00", 1.20) 
+					+ getHDBRates("17:00:00", endTime, 0.60);
+			
+			
+		} else if (carParkStart.isAfter(start) && carParkEnd.isAfter(end) && !dayOfWeek.equalsIgnoreCase("Sun")) {
+			return getHDBRates(startTime, "07:00:00", 0.60)
+					+ getHDBRates("07:00:00", endTime, 1.20);
+			
+		} else if (carParkStart.isAfter(start) && carParkEnd.isBefore(end) && !dayOfWeek.equalsIgnoreCase("Sun")){
+			return getHDBRates(startTime, "07:00:00", 0.60)
+					+ getHDBRates("07:00:00", "17:00:00", 1.20)
+					+ getHDBRates("17:00:00", endTime, 0.60);
 		} else {
 			return getHDBRates(startTime, endTime, 0.60);
 		}
 	}
 
-	public static String getHDBRates(String startTime, String endTime, Double rate) throws ParseException {
+	public static Double getHDBRates(String startTime, String endTime, Double rate) throws ParseException {
 		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 		Date startTimeDate = format.parse(startTime);
 		Date endTimeDate = format.parse(endTime);
 
 		long durationInMillis = endTimeDate.getTime() - startTimeDate.getTime();
+
+		return getHDBRoundedCost(durationInMillis, rate);
+		
+	
+	}
+
+	public static Double getHDBRoundedCost(Long durationInMillis, Double rate) {
 		long secondsDifference = TimeUnit.MILLISECONDS.toSeconds(durationInMillis);
 		double totalCost = rate*secondsDifference/30/60;
 
 		String roundedCost = toTwoDecimalPlaces(totalCost);
 
-		return roundedCost;
-	}
-
-	public static Double getIntermediateRates(String startTime, String endTime, Double rate) throws ParseException {
-		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-		Date startTimeDate = format.parse(startTime);
-		Date endTimeDate = format.parse(endTime);
-
-		long durationInMillis = endTimeDate.getTime() - startTimeDate.getTime();
-		long secondsDifference = TimeUnit.MILLISECONDS.toSeconds(durationInMillis);
-		double totalCost = rate*secondsDifference/30/60;
-
-		return totalCost;
+		return Double.parseDouble(roundedCost);
 	}
 
 
@@ -222,6 +225,7 @@ public class Utils {
 		Date endTimeDate = format.parse(endTimeString);
 
 		long durationInMillis = endTimeDate.getTime() - startTimeDate.getTime();
+		System.out.println(durationInMillis);
 		
 		long minutesDifference = TimeUnit.MILLISECONDS.toMinutes(durationInMillis);
 		if (durationInMillis % 60000 > 0) {
@@ -231,15 +235,31 @@ public class Utils {
 		return minutesDifference;
 	}
 
-	public static Double getFirstShoppingCost(String startTime, ShoppingCarPark sCP) throws ParseException {
-		List<String> listOfMin  = getListOfMin(sCP);
-		List<String> listOfRates = getListOfRates(sCP);
+	public static Integer getMultiplier(Long minutes, Integer divider) {
+		Integer multiplier = (int) (minutes/divider);
 
-		Long minutes = getMinutes(startTime, sCP.getEnd_time());
+		if (minutes%divider > 0) {
+			multiplier++;
+		}
 
-		String cost = toTwoDecimalPlaces(getCulmulativeCost(minutes, listOfMin, listOfRates));
-		return Double.parseDouble(cost);
-			
+		return multiplier;
+	}
+
+	public static Double getURACost(URACarPark cp, Integer multiplier, String weekDayString) {
+		switch (weekDayString) {
+			case "sunPH_rate":
+				String costSun = cp.getSunPH_rate().substring(1, 5);
+				Double rateSun = Double.parseDouble(costSun);
+				return rateSun*multiplier;
+			case "satday_rate":
+				String costSat = cp.getSatday_rate().substring(1, 5);
+				Double rateSat = Double.parseDouble(costSat);
+				return rateSat*multiplier;
+			default:
+				String costWeekDay = cp.getWeekday_rate().substring(1, 5);
+				Double rateWeekDay = Double.parseDouble(costWeekDay);
+				return rateWeekDay*multiplier;
+		}
 	}
 
 	public static List<String> getListOfMin(ShoppingCarPark sCP) {
@@ -258,6 +278,52 @@ public class Utils {
 		listOfRates.add(sCP.getRate3());
 		listOfRates.add(sCP.getRate4());
 		return listOfRates;
+	}
+
+	public static Double getTotalShoppingCostA(List<ShoppingCarPark> sCP, String startTimeString, String endTimeString) throws ParseException{
+		Long minutes = (long) 0;
+
+		if (sCP.size() > 1) {
+			for (int i = 0; i<sCP.size(); i++) {
+				Long min = (long) 0;
+				if (i==0) {
+					min = getMinutes(startTimeString, sCP.get(0).getEnd_time());
+				} else if (i==sCP.size()-1) {
+					min = getMinutes(sCP.get(sCP.size()-1).getStart_time(), endTimeString);
+				} else {
+					min = getMinutes(sCP.get(i).getStart_time(), sCP.get(i).getEnd_time());
+				}
+				minutes += min;
+			}
+		} else {
+			minutes = getMinutes(startTimeString, endTimeString);
+		}
+
+		Double cost = getCulmulativeCost(minutes, getListOfMin(sCP.get(0)), getListOfRates(sCP.get(0)));
+		return cost;
+	}
+
+	public static Double getTotalShoppingCostB(List<ShoppingCarPark> sCP, String startTimeString, String endTimeString) throws ParseException{
+		Long minutes = (long) 0;
+
+		if (sCP.size() > 1) {
+			for (int i = 0; i<sCP.size(); i++) {
+				Long min = (long) 0;
+				if (i==0) {
+					min = getMinutes(sCP.get(0).getStart_time(), sCP.get(0).getEnd_time());
+				} else if (i==sCP.size()-1) {
+					min = getMinutes(sCP.get(sCP.size()-1).getStart_time(), endTimeString);
+				} else {
+					min = getMinutes(sCP.get(i).getStart_time(), sCP.get(i).getEnd_time());
+				}
+				minutes += min;
+			}
+		} else {
+			minutes = getMinutes(sCP.get(0).getStart_time(), endTimeString);
+		}		
+
+		Double cost = getCulmulativeCost(minutes, getListOfMin(sCP.get(0)), getListOfRates(sCP.get(0)));
+		return cost;
 	}
 
 	public static Double getCulmulativeCost(Long minutes, List<String> listOfMin, List<String> listOfRates) {
@@ -302,28 +368,6 @@ public class Utils {
 			return cost;
 		}
 	}
-	
-	public static Double getSecondShoppingCost(String endTime, ShoppingCarPark sCP) throws ParseException {
-		List<String> listOfMin  = getListOfMin(sCP);
-		List<String> listOfRates = getListOfRates(sCP);
-
-		Long minutes = getMinutes(sCP.getStart_time(), endTime);
-		
-		String cost = toTwoDecimalPlaces(getCulmulativeCost(minutes, listOfMin, listOfRates));
-
-		return Double.parseDouble(cost);
-	}
-
-	public static Double getThirdShoppingCost(ShoppingCarPark sCP) throws ParseException {
-		List<String> listOfMin = getListOfMin(sCP);
-		List<String> listOfRates = getListOfRates(sCP);
-
-		Long minutes = getMinutes(sCP.getStart_time(), sCP.getEnd_time());
-
-		String cost = toTwoDecimalPlaces(getCulmulativeCost(minutes, listOfMin, listOfRates));
-
-		return Double.parseDouble(cost);
-	}
 
 	public static String getRateBasedOnDay(String dayOfWeek) {
 		switch (dayOfWeek) {
@@ -334,14 +378,6 @@ public class Utils {
 			default:
 				return("weekday_rate");
 		}
-	}
-
-	public static String getDayOfWeek() {
-		Date dateNow = new Date();
-		SimpleDateFormat format = new SimpleDateFormat("E");
-		String dayOfWeek = format.format(dateNow);
-
-		return dayOfWeek;
 	}
 
 	public static Boolean isShopping(String id) {
@@ -385,14 +421,10 @@ public class Utils {
 		}
 	}
 
-	public static List<ShoppingCarPark> removeCarParks(List<ShoppingCarPark> list, String endTimeString) {
-		for (int i = 0; i<list.size(); i++) {
-			if (isAfter(list.get(i).getStart_time(), endTimeString)) {
-				list.remove(i);
-			}
-		}
-		return list;
+	public static Integer incrementDayOfWeek(Integer dayOfWeekInt) {
+		return dayOfWeekInt < 7 ? dayOfWeekInt+1 : 8;
 	}
+
 
 	public static String toTwoDecimalPlaces(double cost) {
 		DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.US);

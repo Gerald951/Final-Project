@@ -9,10 +9,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import ibf2022.batch2.miniProject.server.exceptions.NearbyCarparkException;
 import ibf2022.batch2.miniProject.server.model.CarPark;
+import ibf2022.batch2.miniProject.server.model.Destination;
 import ibf2022.batch2.miniProject.server.services.AppServices;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -59,11 +62,11 @@ public class AppController {
         
     }
 
-    @GetMapping(path="/search/redirect")
-    public ResponseEntity<String> searchNearbyCarParks(@RequestParam(required = true) String destination, @RequestParam(required = true) Integer distance, @RequestParam(required = true) String parkedTime, @RequestParam(required = true) String exitTime, @RequestParam(required = true) String dayOfWeek) {
+    @PostMapping(path="/search/redirect")
+    public ResponseEntity<String> searchNearbyCarParks(@RequestBody Destination destination) {
 
         try {
-            List<CarPark> listOfCarParks = appServices.getNearbyCarParks(destination, distance, parkedTime, exitTime, dayOfWeek);
+            List<CarPark> listOfCarParks = appServices.getNearbyCarParks(destination.getDestination(), destination.getDistance(), destination.getListOfParkedTime(), destination.getListOfExitTime(), destination.getDayOfWeek());
             
             JsonArrayBuilder arr = Json.createArrayBuilder();
             System.out.println("SUCCESS");
