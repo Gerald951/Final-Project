@@ -37,7 +37,7 @@ public class AppController {
         } else {
             lotAvailability = Integer.parseInt(appServices.getCarParkLotAvailability(destination));
         }
-        
+      
 
         if (lotAvailability != null) {
             if (lotAvailability > 10) {

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -154,64 +153,12 @@ public class Utils {
 		return Double.parseDouble(roundedCost);
 	}
 
-
-	public static String get24hDateFormat(String time) throws ParseException {
-		String timeString = time;
-        DateFormat inputFormat = new SimpleDateFormat("h.mm a");
-        DateFormat outputFormat = new SimpleDateFormat("HH:mm:ss");
-        
-		Date date = inputFormat.parse(timeString);
-		String convertedTime = outputFormat.format(date);
-		return convertedTime;
-        
-	}
-
 	public static Boolean isAfter(String tStart, String startTimeString) {
 		LocalTime startTimeCP = LocalTime.parse(tStart);
         LocalTime startTimeParked = LocalTime.parse(startTimeString);
 
 		return startTimeCP.isAfter(startTimeParked) ? true : false;
 
-	}
-
-	public static Long getSecondsA(String tStart, String endTimeString) throws ParseException {
-		String startTimeCP = get24hDateFormat(tStart);
-
-		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-		Date startTimeDate = format.parse(startTimeCP);
-		Date endTimeDate = format.parse(endTimeString);
-
-		long durationInMillis = endTimeDate.getTime() - startTimeDate.getTime();
-		long secondsDifference = TimeUnit.MILLISECONDS.toSeconds(durationInMillis);
-
-		return secondsDifference;
-	}
-
-	public static Long getSecondsB(String tStart, String tEnd) throws ParseException {
-		String startTimeCP = get24hDateFormat(tStart);
-		String endTimeCP = get24hDateFormat(tEnd);
-
-		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-		Date startTimeDate = format.parse(startTimeCP);
-		Date endTimeDate = format.parse(endTimeCP);
-
-		long durationInMillis = endTimeDate.getTime() - startTimeDate.getTime();
-		long secondsDifference = TimeUnit.MILLISECONDS.toSeconds(durationInMillis);
-
-		return secondsDifference;
-	}
-
-	public static Long getSecondsC(String startTimeString, String tEnd) throws ParseException {
-		String endTimeCP = get24hDateFormat(tEnd);
-
-		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-		Date startTimeDate = format.parse(startTimeString);
-		Date endTimeDate = format.parse(endTimeCP);
-
-		long durationInMillis = endTimeDate.getTime() - startTimeDate.getTime();
-		long secondsDifference = TimeUnit.MILLISECONDS.toSeconds(durationInMillis);
-
-		return secondsDifference;
 	}
 
 	public static Long getMinutes(String startTime, String endTime) throws ParseException {
@@ -381,11 +328,6 @@ public class Utils {
 				return 7;
 		}
 	}
-
-	public static Integer incrementDayOfWeek(Integer dayOfWeekInt) {
-		return dayOfWeekInt < 7 ? dayOfWeekInt+1 : 8;
-	}
-
 
 	public static String toTwoDecimalPlaces(double cost) {
 		DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.US);

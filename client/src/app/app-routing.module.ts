@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './components/login.component';
+import { SearchComponent } from './components/search.component';
 
 const routes: Routes = [
-  {path:'', component:LoginComponent},
+  {path:'', component:SearchComponent},
   {path: "**", redirectTo:'/', pathMatch: 'full'}
 ];
 
