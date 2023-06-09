@@ -3,11 +3,13 @@ package ibf2022.batch2.miniProject.server.model;
 import java.util.List;
 
 public class Destination {
+    private String id;
     private String destination;
     private Integer distance;
     private List<String> listOfParkedTime;
     private List<String> listOfExitTime;
     private List<String> dayOfWeek;
+    
     public String getDestination() {
         return destination;
     }
@@ -43,6 +45,12 @@ public class Destination {
     }
     public void setDayOfWeek(List<String> dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
+    }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
     }
     
    

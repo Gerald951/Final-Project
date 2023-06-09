@@ -1,7 +1,10 @@
 package ibf2022.batch2.miniProject.server;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -21,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 import com.opencsv.CSVReader;
 
 import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 
 public class Utils {
     
@@ -318,7 +324,7 @@ public class Utils {
 				return 2;
 			case "Wed":
 				return 3;
-			case "Thur":
+			case "Thu":
 				return 4;
 			case "Fri":
 				return 5;
@@ -338,6 +344,14 @@ public class Utils {
 
 		return roundedCost;
 	}
+
+	public static JsonObject stringToJson(String s) throws IOException {
+        try (InputStream is = new ByteArrayInputStream(s.getBytes())) {
+            JsonReader jrd = Json.createReader(is);
+            JsonObject jo = jrd.readObject();
+            return jo;
+        }
+    }
 
 	
     

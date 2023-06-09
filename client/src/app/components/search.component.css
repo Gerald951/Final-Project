@@ -1,0 +1,35 @@
+.timeIn {
+    margin-top: 4px;
+    margin-left: 20px;
+    margin-bottom: 40px;
+}
+
+.dateIn {
+    margin-bottom: 4px;
+    margin-left: 20px;
+}
+
+.destination {
+    margin-bottom: 4px;
+    margin-left: 20px;
+}
+
+.matFormField {
+    margin-bottom: 20px;
+    margin-left: 20px;
+}
+
+.example-full-width {
+    margin-left: 20px;
+}
+
+.button {
+    margin-left: 20px;
+}
+
+.err {
+    margin-bottom: 5px;
+    margin-left: 20px;
+    font-style: italic;
+}
+

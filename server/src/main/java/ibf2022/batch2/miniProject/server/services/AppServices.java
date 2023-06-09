@@ -18,8 +18,11 @@ import ibf2022.batch2.miniProject.server.exceptions.CoordinatesException;
 import ibf2022.batch2.miniProject.server.exceptions.NearbyCarparkException;
 import ibf2022.batch2.miniProject.server.model.CarPark;
 import ibf2022.batch2.miniProject.server.model.Coordinates;
+import ibf2022.batch2.miniProject.server.model.Destination;
 import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
 import ibf2022.batch2.miniProject.server.repositories.AppRepository;
+import ibf2022.batch2.miniProject.server.repositories.MongoRepository;
+import jakarta.json.JsonArray;
 
 @Service
 public class AppServices {
@@ -29,6 +32,9 @@ public class AppServices {
 
     @Autowired
     private AppRepository appRepository;
+
+	@Autowired
+	private MongoRepository mongoRepository;
     
     public Integer getLotAvailability(String shoppingCenter) {
 		
@@ -200,6 +206,14 @@ public class AppServices {
 		}
 
 		return listOfCarParks;
+	}
+
+	public Boolean insertDocument(Destination destination, JsonArray arr) {
+		return mongoRepository.insertDocument(destination, arr);
+	}
+
+	public String getBundleByBundleId(String id) {
+		return mongoRepository.getBundleByBundleId(id);
 	}
 }
 

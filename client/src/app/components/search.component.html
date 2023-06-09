@@ -1,3 +1,49 @@
-<mat-slide-toggle>Toggle!</mat-slide-toggle>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <h4 class="destination">Select your destination:</h4>
+  <mat-form-field class="matFormField">
+    <mat-select placeholder="Destination" formControlName="destination" required>
+      <mat-option *ngFor="let d of destinationOptions" [value]="d">{{d}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div>
+    <h4 class="dateIn">Select Date In</h4>
+    <mat-form-field class="example-full-width">
+      <mat-label>Date In</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="dateIn">
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker">
+        <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+      </mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+  </div>
+  
+  <div class="timeIn">
+    <label for="appt">Select time In:</label>
+    &nbsp;
+    <input type="time" id="appt" name="appt" formControlName="hourIn"
+       min="00:00" max="23:59" required>
+  </div>
+  <div>
+    <h4 class="dateIn">Select Date Out</h4>
+    <mat-form-field class="example-full-width">
+      <mat-label>Date Out</mat-label>
+      <input matInput [matDatepicker]="picker2" formControlName="dateOut">
+      <mat-hint class="hint">MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker2">
+        <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+      </mat-datepicker-toggle>
+      <mat-datepicker #picker2></mat-datepicker>
+  </mat-form-field>
+  </div>
+  
+  <div class="timeIn">
+    <label for="appt">Select time Out:</label>
+    &nbsp;
+    <input type="time" id="appt" name="appt" formControlName="hourOut"
+       min="00:00" max="23:59" required>
+  </div>
 
-<p>Help Lah</p>
+  <div class="err" *ngIf="form!.touched && form!.invalid">Please make sure DateIn/TimeIn is selected before DateOut/TimeOut</div>
+  <button class="button" type="submit" [disabled]="!form.valid">Submit</button>
+</form>

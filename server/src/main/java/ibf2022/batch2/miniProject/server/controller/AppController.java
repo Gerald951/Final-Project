@@ -1,5 +1,6 @@
 package ibf2022.batch2.miniProject.server.controller;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -9,10 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import ibf2022.batch2.miniProject.server.Utils;
 import ibf2022.batch2.miniProject.server.exceptions.NearbyCarparkException;
 import ibf2022.batch2.miniProject.server.model.CarPark;
 import ibf2022.batch2.miniProject.server.model.Destination;
@@ -27,6 +30,8 @@ public class AppController {
 
     @Autowired
     private AppServices appServices;
+
+
 
     @GetMapping(path="/search/lot")
     public ResponseEntity<String> searchLotAvailability(@RequestParam(required = true) String destination, @RequestParam(required = true) String type) {
@@ -78,18 +83,37 @@ public class AppController {
                                                             .add("longitude", listOfCarParks.get(i).getLongitude())
                                                             .add("distance", Double.toString(listOfCarParks.get(i).getDistance()))
                                                             .add("cost", listOfCarParks.get(i).getCost())
-                                                            .add("lots_available", listOfCarParks.get(i).getLotsAvailable())
+                                                            .add("lotsAvailable", listOfCarParks.get(i).getLotsAvailable())
                                                             .build();
                 arr.add(jo);                                            
             }
 
             JsonArray array = arr.build();
 
+            appServices.insertDocument(destination, array);
+
             return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(array.toString());
         } catch (NearbyCarparkException | ParseException e) {
             JsonObject err = Json.createObjectBuilder().add("error", "No Nearby CarParks Found.").build();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(err.toString());
         }
+        
+    }
+
+    @GetMapping(path="/search/{id}")
+    public ResponseEntity<String> searchDocument(@PathVariable(required = true) String id) {
+        String joString = appServices.getBundleByBundleId(id);
+
+        try {
+            JsonObject result = Utils.stringToJson(joString);
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(result.toString());
+            
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            JsonObject err = Json.createObjectBuilder().add("error", "No document of id=%s is found".formatted(id)).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(err.toString());
+        }
+
         
     }
 }
