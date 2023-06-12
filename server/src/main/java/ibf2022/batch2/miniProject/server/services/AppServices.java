@@ -209,7 +209,7 @@ public class AppServices {
 	}
 
 	public Boolean insertDocument(Destination destination, JsonArray arr) {
-		return mongoRepository.insertDocument(destination, arr);
+		return mongoRepository.insertDestination(destination, arr);
 	}
 
 	public String getBundleByBundleId(String id) {

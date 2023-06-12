@@ -19,8 +19,13 @@ import { NavigationDemoComponent } from './navigation-demo/navigation-demo.compo
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { DisplayComponent } from './components/display.component';
+import { MapComponent } from './components/map.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +33,8 @@ import { DisplayComponent } from './components/display.component';
     LoginComponent,
     SearchComponent,
     NavigationDemoComponent,
-    DisplayComponent
+    DisplayComponent,
+    MapComponent
   ],
   imports: [
     BrowserModule,
@@ -46,7 +52,11 @@ import { DisplayComponent } from './components/display.component';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatInputModule
+    MatInputModule,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule
 
   
   ],

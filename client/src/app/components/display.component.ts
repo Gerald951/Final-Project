@@ -1,58 +1,47 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { SearchService } from '../services/search.service';
 import { ActivatedRoute } from '@angular/router';
-import { map, Subscription } from 'rxjs';
-import { Destination } from '../model/destination';
-import { Carpark } from '../model/carpark';
+import { ResultsDataSource } from '../model/ResultsDataSource';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-display',
   templateUrl: './display.component.html',
   styleUrls: ['./display.component.css']
 })
-export class DisplayComponent implements OnInit, OnDestroy {
-  destination_! : Destination
-  carparkList : Carpark[] = []
-  destination! : string
+export class DisplayComponent implements OnInit, AfterViewInit {
   id! : string
-  sub! : Subscription
+  destination! : string
+  dataSource! : ResultsDataSource
+  displayedColumns = ["carParkId", "address", "lotsAvailable", "distance", "cost"]
+
+  @ViewChild(MatSort)
+  sort! : MatSort
+
   constructor(private searchSvc : SearchService, private activatedRoute : ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.destination = this.activatedRoute.snapshot.params['destination']
+    
     this.id = this.activatedRoute.snapshot.params['id']
+    this.destination = this.activatedRoute.snapshot.params['destination']
+    
+    this.dataSource = new ResultsDataSource(this.searchSvc)
+    this.dataSource.loadResults(this.id)
+  }
 
-    this.sub =  this.searchSvc.getNearbyCP(this.id).pipe(
-      map(data => {
-        // Map destination object
-        this.destination_ = {
-          id: data.id,
-          destination: data.destination,
-          distance: data.distance,
-          listOfParkedTime: data.listOfParkedTime.map((parkedTime: string)=> ({ parkedTime })),
-          listOfExitTime: data.listOfExitTime.map((exitTime: string) => ({ exitTime })),
-          dayOfWeek: data.dayOfWeek.map((day: string) => ({ day }))
-        };
+  onRowClicked(row : any) {
+    console.info('Row is clicked: ',row)
+  }
 
-         // Map carpark list
-         this.carparkList = data.listOfCarParks.map((carpark: { carParkId: any; address: any; latitude: any; longitude: any; distance: any; cost: any; lotsAvailable: any; }) => ({
-          carParkId: carpark.carParkId,
-          address: carpark.address,
-          latitude: carpark.latitude,
-          longitude: carpark.longitude,
-          distance: carpark.distance,
-          cost: carpark.cost,
-          lotsAvailable: carpark.lotsAvailable
-        }));
-      })
-    ).subscribe();
-
-    console.info(this.destination)
-    console.info(this.carparkList)
+  changeDistance() {
 
   }
 
-  ngOnDestroy(): void {
-      this.sub.unsubscribe()
+  ngAfterViewInit(): void {
+      this.sort.sortChange.subscribe(() => {
+        console.info("sort1");
+      const activeSort = this.sort.active;
+      this.dataSource.sortResults(activeSort);
+      })
   }
 }

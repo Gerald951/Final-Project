@@ -1,6 +1,5 @@
 package ibf2022.batch2.miniProject.server.controller;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -76,12 +75,12 @@ public class AppController {
             JsonArrayBuilder arr = Json.createArrayBuilder();
             System.out.println("SUCCESS");
             for (int i = 0; i<listOfCarParks.size(); i++) {
-                System.out.println(listOfCarParks.get(i).getAddress());
+                System.out.println(listOfCarParks.get(i).getAddress().trim());
                 JsonObject jo = Json.createObjectBuilder().add("carParkId", listOfCarParks.get(i).getCarParkId())
-                                                            .add("address", listOfCarParks.get(i).getAddress())
+                                                            .add("address", Utils.capitalizeFirstLetter(listOfCarParks.get(i).getAddress().trim()))
                                                             .add("latitude", listOfCarParks.get(i).getLatitude())
                                                             .add("longitude", listOfCarParks.get(i).getLongitude())
-                                                            .add("distance", Double.toString(listOfCarParks.get(i).getDistance()))
+                                                            .add("distance", listOfCarParks.get(i).getDistance())
                                                             .add("cost", listOfCarParks.get(i).getCost())
                                                             .add("lotsAvailable", listOfCarParks.get(i).getLotsAvailable())
                                                             .build();
@@ -90,7 +89,9 @@ public class AppController {
 
             JsonArray array = arr.build();
 
-            appServices.insertDocument(destination, array);
+            Destination dest = Utils.insertQuotes(destination);
+
+            appServices.insertDocument(dest, array);
 
             return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(array.toString());
         } catch (NearbyCarparkException | ParseException e) {
@@ -104,15 +105,15 @@ public class AppController {
     public ResponseEntity<String> searchDocument(@PathVariable(required = true) String id) {
         String joString = appServices.getBundleByBundleId(id);
 
-        try {
-            JsonObject result = Utils.stringToJson(joString);
-            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(result.toString());
+        // try {
+            // JsonObject result = Utils.stringToJson(joString);
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(joString);
             
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            JsonObject err = Json.createObjectBuilder().add("error", "No document of id=%s is found".formatted(id)).build();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(err.toString());
-        }
+        // } catch (IOException e) {
+        //     // TODO Auto-generated catch block
+        //     JsonObject err = Json.createObjectBuilder().add("error", "No document of id=%s is found".formatted(id)).build();
+        //     return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(err.toString());
+        // }
 
         
     }

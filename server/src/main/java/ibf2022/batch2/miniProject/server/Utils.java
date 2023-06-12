@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.opencsv.CSVReader;
 
+import ibf2022.batch2.miniProject.server.model.Destination;
 import ibf2022.batch2.miniProject.server.model.ShoppingCarPark;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -353,6 +354,45 @@ public class Utils {
         }
     }
 
+	public static Destination insertQuotes(Destination destination) {
+		List<String> listOfParkedTime = new LinkedList<>();
+		for (String l : destination.getListOfParkedTime()) {
+			String updated = "\"" + l + "\"";
+			listOfParkedTime.add(updated);
+		}
+		destination.setListOfParkedTime(listOfParkedTime);
+
+
+		List<String> listOfExitTime = new LinkedList<>();
+		for (String e : destination.getListOfExitTime()) {
+			String updated = "\"" + e + "\"";
+			listOfExitTime.add(updated);
+		}
+		destination.setListOfExitTime(listOfExitTime);
+
+		List<String> dayOfWeek = new LinkedList<>();
+		for (String w : destination.getDayOfWeek()) {
+			String updated = "\"" + w + "\"";
+			dayOfWeek.add(updated);
+		}
+		destination.setDayOfWeek(dayOfWeek);
+
+		return destination;
+
+		
+	}
+
+	public static String capitalizeFirstLetter(String str) {
+        String[] words = str.split(" ");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            String capitalizedWord = word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+            result.append(capitalizedWord).append(" ");
+        }
+
+        return result.toString().trim();
+    }
 	
     
 }

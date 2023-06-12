@@ -1,1 +1,42 @@
-<p>display works!</p>
+<!-- <mat-form-field appearance="outline">
+    <mat-label>Search</mat-label>
+    <input matInput type="text" placeholder="Enter your search term">
+  </mat-form-field> -->
+<div class="course">
+    <div class="spinner-container" *ngIf="dataSource.loading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <mat-table class="lessons-table mat-elevation-z8" [dataSource]="dataSource"
+        matSort matSortActive="cost" matSortDirection="asc" matSortDisableClear>
+
+        <ng-container matColumnDef="carParkId">
+            <mat-header-cell *matHeaderCellDef>Carpark ID</mat-header-cell>
+            <mat-cell *matCellDef="let resultList">{{resultList.carParkId}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="address">
+            <mat-header-cell *matHeaderCellDef>Address</mat-header-cell>
+            <mat-cell *matCellDef="let resultList">{{resultList.address}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="lotsAvailable">
+            <mat-header-cell *matHeaderCellDef>Lots Available</mat-header-cell>
+            <mat-cell *matCellDef="let resultList">{{resultList.lotsAvailable}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="distance">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Distance from Destination (m)</mat-header-cell>
+            <mat-cell *matCellDef="let resultList">{{resultList.distance }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="cost">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Cost</mat-header-cell>
+            <mat-cell *matCellDef="let resultList">{{resultList.cost}}</mat-cell>
+        </ng-container>
+
+        
+
+        <mat-header-row *matHeaderRowDef="displayedColumns" class="center-cell"></mat-header-row>
+
+        <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onRowClicked(row)"></mat-row>
+
+    </mat-table>
+</div>
+
