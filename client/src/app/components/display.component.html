@@ -2,7 +2,7 @@
     <mat-label>Search</mat-label>
     <input matInput type="text" placeholder="Enter your search term">
   </mat-form-field> -->
-<div class="course">
+<div class="container">
     <div class="spinner-container" *ngIf="dataSource.loading$ | async">
         <mat-spinner></mat-spinner>
     </div>
@@ -31,12 +31,27 @@
             <mat-cell *matCellDef="let resultList">{{resultList.cost}}</mat-cell>
         </ng-container>
 
-        
-
         <mat-header-row *matHeaderRowDef="displayedColumns" class="center-cell"></mat-header-row>
 
         <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onRowClicked(row)"></mat-row>
 
     </mat-table>
+
+    <form [formGroup]="input" (ngSubmit)="onInputChange()">
+        <h5 class="default">Default Distance = 200m (from Destination)</h5>
+        
+        <div class="timeIn">
+            <label for="appt">Update Distance (m):</label>
+            &nbsp;
+            <input type="number" formControlName="inputDist" required>
+            &nbsp;
+            <button class="button" type="submit" [disabled]="!input.valid">Reload</button>   
+        </div>
+    </form>
 </div>
+
+    
+    
+  
+
 

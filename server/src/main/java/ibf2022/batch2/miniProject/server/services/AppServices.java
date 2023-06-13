@@ -212,8 +212,8 @@ public class AppServices {
 		return mongoRepository.insertDestination(destination, arr);
 	}
 
-	public String getBundleByBundleId(String id) {
-		return mongoRepository.getBundleByBundleId(id);
+	public String getBundleByBundleId(String id, Integer distance) {
+		return mongoRepository.getBundleByBundleId(id, distance);
 	}
 }
 

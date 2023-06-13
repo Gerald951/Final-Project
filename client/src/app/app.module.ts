@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SearchComponent } from './components/search.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -24,6 +24,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field'
 import { DisplayComponent } from './components/display.component';
 import { MapComponent } from './components/map.component';
 
@@ -40,6 +41,7 @@ import { MapComponent } from './components/map.component';
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
     MatSlideToggleModule,
@@ -53,6 +55,7 @@ import { MapComponent } from './components/map.component';
     MatDatepickerModule,
     MatNativeDateModule,
     MatInputModule,
+    MatFormFieldModule,
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,

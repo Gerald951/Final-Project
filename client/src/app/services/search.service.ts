@@ -30,8 +30,8 @@ export class SearchService {
     return this.http.post<string>(SERVER_URL + '/search/redirect', body, {headers:headers, observe:'response'})
   }
 
-  getNearbyCP(id : string, filter ='', sortOrder='asc', pageNumber = 0, pageSize = 3) : Observable<any> {
-    return this.http.get<Carpark[]>(SERVER_URL + '/search/' + id)
+  getNearbyCP(id : string, distance : string, filter ='', sortOrder='asc', pageNumber = 0, pageSize = 3) : Observable<any> {
+    return this.http.get<Carpark[]>(SERVER_URL + '/search/' + id + '/' + distance)
    
     
     }

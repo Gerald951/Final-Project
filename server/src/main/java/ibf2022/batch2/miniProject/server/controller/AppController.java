@@ -101,9 +101,9 @@ public class AppController {
         
     }
 
-    @GetMapping(path="/search/{id}")
-    public ResponseEntity<String> searchDocument(@PathVariable(required = true) String id) {
-        String joString = appServices.getBundleByBundleId(id);
+    @GetMapping(path="/search/{id}/{distance}")
+    public ResponseEntity<String> searchDocument(@PathVariable(required = true) String id, @PathVariable(required = true) String distance) {
+        String joString = appServices.getBundleByBundleId(id, Integer.parseInt(distance));
 
         // try {
             // JsonObject result = Utils.stringToJson(joString);

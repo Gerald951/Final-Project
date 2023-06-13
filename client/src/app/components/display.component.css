@@ -5,3 +5,29 @@ table {
   mat-header-cell, mat-cell {
     justify-content: center;
   }
+
+  .container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .default {
+    margin-left : 20px;
+    margin-top : 50px;
+    font-size: 100%;
+    
+  }
+
+  .example-form-field {
+    margin-left : 20px;
+
+  }
+
+  .timeIn {
+    margin-left: 20px;
+    font-size: 99%;
+  }
+
+
+
+ 

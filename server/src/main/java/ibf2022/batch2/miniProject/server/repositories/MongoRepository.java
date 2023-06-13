@@ -33,8 +33,8 @@ public class MongoRepository {
         
     }
     
-    public String getBundleByBundleId(String id) {
-		Query query = Query.query(Criteria.where("id").is(id));
+    public String getBundleByBundleId(String id, Integer distance) {
+		Query query = Query.query(Criteria.where("id").is(id).and("distance").is(distance));
 
 		Document result = mongoTemplate.findOne(query, Document.class, "archives");
 
