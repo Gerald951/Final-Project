@@ -1,1 +1,16 @@
-<p>map works!</p>
+<h3 style="margin-left: 20px;">Real Time Journey Updates</h3>
+<div id="map">
+    <google-map
+    height ="400px" width="750px"
+            [zoom]="zoom">
+            
+        <map-directions-renderer *ngIf="(directionsResults$ | async) as directionsResults"
+                           [directions]="directionsResults"></map-directions-renderer>
+    </google-map>
+    <div id="renderer"></div>
+</div>
+&nbsp;
+<div style="margin-left: 20px;">
+    <button type="button" (click)="setMap()">End Journey</button>
+</div>
+

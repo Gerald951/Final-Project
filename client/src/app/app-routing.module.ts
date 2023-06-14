@@ -7,7 +7,7 @@ import { MapComponent } from './components/map.component';
 const routes: Routes = [
   {path:'', component:SearchComponent},
   {path:'display/:id/:destination', component:DisplayComponent},
-  {path: 'map/:object', component:MapComponent, data:{paramTypes : {object : 'object'}}},
+  {path: 'map/:object', component:MapComponent},
   {path: "**", redirectTo:'/', pathMatch: 'full'}
 ];
 

@@ -27,6 +27,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { DisplayComponent } from './components/display.component';
 import { MapComponent } from './components/map.component';
+import { GoogleMapsModule } from '@angular/google-maps';
+
+
 
 @NgModule({
   declarations: [
@@ -59,7 +62,9 @@ import { MapComponent } from './components/map.component';
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    GoogleMapsModule
+
 
   
   ],

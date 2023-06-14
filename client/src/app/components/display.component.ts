@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { SearchService } from '../services/search.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ResultsDataSource } from '../model/ResultsDataSource';
 import { MatSort } from '@angular/material/sort';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { map, Subscription } from 'rxjs';
+import { Carpark } from '../model/carpark';
 
 @Component({
   selector: 'app-display',
@@ -22,7 +23,7 @@ export class DisplayComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort)
   sort! : MatSort
 
-  constructor(private searchSvc : SearchService, private activatedRoute : ActivatedRoute, private fb : FormBuilder) {
+  constructor(private searchSvc : SearchService, private activatedRoute : ActivatedRoute, private fb : FormBuilder, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -39,9 +40,18 @@ export class DisplayComponent implements OnInit, AfterViewInit {
 
   onRowClicked(row : any) {
     console.info('Row is clicked: ',row)
-  }
-
-  changeDistance() {
+    const c = {
+      carParkId : row.carParkId,
+      address : row.address,
+      latitude : row.latitude,
+      longitude : row.longitude,
+      distance : row.distance,
+      cost : row.cost,
+      lotsAvailable : row.lotsAvailable
+    } as Carpark
+    
+    console.info(c)
+    this.router.navigate(['/map', JSON.stringify(c)])
 
   }
 
