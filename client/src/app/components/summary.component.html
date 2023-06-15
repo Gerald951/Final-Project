@@ -1,0 +1,24 @@
+<div style="margin-left: 20px;">
+    <h2>Journey Summary</h2>
+    <ul style="list-style-type: none; ">
+        <li style="margin-bottom: 8px;">
+        <b style="width: 220px; display: inline-block;">Carpark ID:</b>
+        {{carP.carParkId}}
+        </li>
+        <li style="margin-bottom: 8px;">
+        <b style="width: 220px; display: inline-block;">Destination:</b>
+        {{carP.address}}
+        </li>
+        <li style="margin-bottom: 8px;">
+        <b style="width: 220px; display: inline-block;">Distance from destination (m):</b>
+        {{carP.distance}}
+        </li>
+        <li style="margin-bottom: 8px;">
+        <b style="width: 220px; display: inline-block;">Projected cost:</b>
+        ${{carP.cost}}
+        </li>
+    </ul>
+</div>
+<div style="margin-left: 20px; margin-top: 50px;">
+    <button type="button" (click)="return()">Return to Search Page</button>
+</div>

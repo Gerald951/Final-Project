@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import com.mongodb.client.result.DeleteResult;
+
 import ibf2022.batch2.miniProject.server.model.Destination;
 import jakarta.json.JsonArray;
 
@@ -33,7 +35,7 @@ public class MongoRepository {
         
     }
     
-    public String getBundleByBundleId(String id, Integer distance) {
+    public String getCarParkById(String id, Integer distance) {
 		Query query = Query.query(Criteria.where("id").is(id).and("distance").is(distance));
 
 		Document result = mongoTemplate.findOne(query, Document.class, "archives");
@@ -45,6 +47,15 @@ public class MongoRepository {
 		}
 
 		
+	}
+
+	public Boolean deleteRecord(String id) {
+		Query query = new Query(Criteria.where("id").is(id));
+    	DeleteResult result = mongoTemplate.remove(query, "archives");
+		
+		String count = Long.toString(result.getDeletedCount());
+
+		return Integer.parseInt(count) != 0 ? true : false ;
 	}
     
 }

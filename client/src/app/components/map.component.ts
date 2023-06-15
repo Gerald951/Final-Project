@@ -1,10 +1,11 @@
 /// <reference types="@types/google.maps" />
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Carpark } from '../model/carpark';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MapDirectionsService } from '@angular/google-maps';
-import { Observable, map } from 'rxjs';
+import { Observable, Subscription, interval, map } from 'rxjs';
+import { SearchService } from '../services/search.service';
 
 
 @Component({
@@ -12,7 +13,7 @@ import { Observable, map } from 'rxjs';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit{
+export class MapComponent implements OnInit, OnDestroy{
   cp! : Carpark
   map!: google.maps.Map;
   directionsResults$! : Observable<google.maps.DirectionsResult|undefined>
@@ -22,13 +23,15 @@ export class MapComponent implements OnInit{
   "Millenia Singapore", "The Esplanade", "Raffles City", "Marina Square", "Suntec City", "Marina Bay Sands", "Centrepoint", "Cineleisure", "Orchard Point", "Concorde Hotel", "Plaza Singapura",
   "The Cathay", "Mandarin Hotel", "Wisma Atria", "The Heeren", "Ngee Ann City", "Orchard Central", "Wheelock Place", "Orchard Gateway", "Tang Plaza", "Far East Plaza", "Paragon",
   "313@Somerset", "The Atrium@Orchard", "Bukit Panjang Plaza", "Clarke Quay", "The Star Vista", "Funan Mall", "Lot One", "Tampines Mall", "Junction 8", "Bedok Mall", "Bugis+"];
+  carParkLot$! : Promise<string>
+  notExist : boolean = false
+  sub$! : Subscription
+  watchId! : number
 
-
-  constructor(private activatedRoute : ActivatedRoute, private mapDirectionService : MapDirectionsService) {}
+  constructor(private activatedRoute : ActivatedRoute, private mapDirectionService : MapDirectionsService, private searchSvc : SearchService, private router: Router) {}
 
   ngOnInit(): void {
       this.activatedRoute.params.subscribe(params => {
-        console.info(params['object'])
         const cP = JSON.parse(params['object']) as Carpark
 
         const carPark = {
@@ -119,8 +122,27 @@ export class MapComponent implements OnInit{
   }
 
   trackLocation(directionsRenderer: google.maps.DirectionsRenderer) {
+    let watchId: number;
+  
+    this.sub$ = interval(120000).subscribe(() => {
+      console.info('Checking Lot Availability...')
+      const carParkLot$ = this.destinationOptions.includes(this.cp.address)
+        ? this.searchSvc.getLotAvailability(this.cp.address, "S")
+        : this.searchSvc.getLotAvailability(this.cp.address, "C");
+  
+      carParkLot$.then((lot: any) => {
+        console.info(lot);
+  
+        if ('OK' in lot) {
+          this.notExist = false;
+        } else {
+          this.notExist = true;
+        }
+      });
+    });
+  
     if (navigator.geolocation) {
-      const watchId = navigator.geolocation.watchPosition((position) => {
+      this.watchId = navigator.geolocation.watchPosition((position) => {
         const { latitude, longitude } = position.coords;
         const pos = { lat: latitude, lng: longitude };
         this.map.setCenter(pos);
@@ -156,13 +178,26 @@ export class MapComponent implements OnInit{
     } else {
       console.error('Error: Your browser doesn\'t support geolocation.');
     }
+  
+    // Unsubscribe from the interval first and clear the geolocation watch
+  
   }
 
-  setMap() {
-    console.info('End Journey')
-    if (this.destinationOptions.includes(this.cp.address)) {
-      
+  ngOnDestroy() {
+    this.sub$.unsubscribe();
+
+    if (this.watchId) {
+      navigator.geolocation.clearWatch(this.watchId);
     }
+  }
+
+  endJourney() {
+    console.info('End Journey')
+    this.router.navigate(['/summary', JSON.stringify(this.cp)])
+  }
+
+  dismiss() {
+    this.router.navigate(['/display', this.cp.carParkId, this.cp.address])
   }
 
 

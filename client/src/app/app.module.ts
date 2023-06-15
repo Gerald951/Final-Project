@@ -28,6 +28,8 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { DisplayComponent } from './components/display.component';
 import { MapComponent } from './components/map.component';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { AlertComponent } from './components/alert.component';
+import { SummaryComponent } from './components/summary.component';
 
 
 
@@ -38,7 +40,9 @@ import { GoogleMapsModule } from '@angular/google-maps';
     SearchComponent,
     NavigationDemoComponent,
     DisplayComponent,
-    MapComponent
+    MapComponent,
+    AlertComponent,
+    SummaryComponent
   ],
   imports: [
     BrowserModule,

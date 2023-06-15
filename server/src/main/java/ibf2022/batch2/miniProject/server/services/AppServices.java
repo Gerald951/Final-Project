@@ -212,8 +212,12 @@ public class AppServices {
 		return mongoRepository.insertDestination(destination, arr);
 	}
 
-	public String getBundleByBundleId(String id, Integer distance) {
-		return mongoRepository.getBundleByBundleId(id, distance);
+	public String getCarParkById(String id, Integer distance) {
+		return mongoRepository.getCarParkById(id, distance);
+	}
+
+	public Boolean deleteRecord(String id) {
+		return mongoRepository.deleteRecord(id);
 	}
 }
 

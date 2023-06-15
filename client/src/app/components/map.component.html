@@ -10,7 +10,10 @@
     <div id="renderer"></div>
 </div>
 &nbsp;
+<div>
+    <app-alert *ngIf="notExist" (toDismiss)="dismiss()"></app-alert>
+</div>
 <div style="margin-left: 20px;">
-    <button type="button" (click)="setMap()">End Journey</button>
+    <button type="button" (click)="endJourney()">End Journey</button>
 </div>
 

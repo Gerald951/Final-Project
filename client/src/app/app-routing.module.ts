@@ -3,11 +3,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { SearchComponent } from './components/search.component';
 import { DisplayComponent } from './components/display.component';
 import { MapComponent } from './components/map.component';
+import { SummaryComponent } from './components/summary.component';
 
 const routes: Routes = [
   {path:'', component:SearchComponent},
   {path:'display/:id/:destination', component:DisplayComponent},
   {path: 'map/:object', component:MapComponent},
+  {path: 'summary/:carPark', component:SummaryComponent},
   {path: "**", redirectTo:'/', pathMatch: 'full'}
 ];
 

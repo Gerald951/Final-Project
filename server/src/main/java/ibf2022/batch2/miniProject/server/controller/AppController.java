@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +30,6 @@ public class AppController {
 
     @Autowired
     private AppServices appServices;
-
-
 
     @GetMapping(path="/search/lot")
     public ResponseEntity<String> searchLotAvailability(@RequestParam(required = true) String destination, @RequestParam(required = true) String type) {
@@ -103,7 +102,7 @@ public class AppController {
 
     @GetMapping(path="/search/{id}/{distance}")
     public ResponseEntity<String> searchDocument(@PathVariable(required = true) String id, @PathVariable(required = true) String distance) {
-        String joString = appServices.getBundleByBundleId(id, Integer.parseInt(distance));
+        String joString = appServices.getCarParkById(id, Integer.parseInt(distance));
 
         // try {
             // JsonObject result = Utils.stringToJson(joString);
@@ -116,6 +115,19 @@ public class AppController {
         // }
 
         
+    }
+
+    @DeleteMapping(path="/delete/{id}")
+    public ResponseEntity<String> deleteDocument(@PathVariable(required = true) String id) {
+        if (appServices.deleteRecord(id) == true) {
+            JsonObject ok = Json.createObjectBuilder().add("OK", "Records Deleted").build();
+
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(ok.toString());
+        } else {
+            JsonObject ok = Json.createObjectBuilder().add("NOT OK", "Problems in record deletion").build();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body(ok.toString());
+        }
     }
 }
 

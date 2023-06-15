@@ -35,5 +35,9 @@ export class SearchService {
    
     
     }
+
+    deleteRecord(id : string) : Promise<string> {
+      return lastValueFrom(this.http.delete<string>(SERVER_URL +'/delete/' + id))
+    }
   }
 
