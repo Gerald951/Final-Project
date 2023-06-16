@@ -154,6 +154,7 @@ public class AppServices {
 
 		// Get Total Rates
 		for (CarPark c : listOfCarParks) {
+			System.out.println("carpark address:%s".formatted(c.getAddress()));
 			if (Utils.getListOfHDBCarParks().contains(c.getCarParkId())) {
 				// CarPark is HDB
 				if (Utils.isCarparkCentral(c.getCarParkId())) {

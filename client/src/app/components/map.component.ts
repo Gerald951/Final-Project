@@ -27,6 +27,7 @@ export class MapComponent implements OnInit, OnDestroy{
   notExist : boolean = false
   sub$! : Subscription
   watchId! : number
+  id! : string
 
   constructor(private activatedRoute : ActivatedRoute, private mapDirectionService : MapDirectionsService, private searchSvc : SearchService, private router: Router) {}
 
@@ -46,6 +47,8 @@ export class MapComponent implements OnInit, OnDestroy{
 
         console.info(carPark)
         this.cp = carPark
+
+        this.id = params['id'] as string
         this.initializeMap()
       })
 
@@ -193,7 +196,7 @@ export class MapComponent implements OnInit, OnDestroy{
 
   endJourney() {
     console.info('End Journey')
-    this.router.navigate(['/summary', JSON.stringify(this.cp)])
+    this.router.navigate(['/summary', JSON.stringify(this.cp), this.id])
   }
 
   dismiss() {

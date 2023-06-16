@@ -51,7 +51,7 @@ export class DisplayComponent implements OnInit, AfterViewInit {
     } as Carpark
     
     console.info(c)
-    this.router.navigate(['/map', JSON.stringify(c)])
+    this.router.navigate(['/map', JSON.stringify(c), this.id])
 
   }
 

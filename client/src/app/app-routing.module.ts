@@ -8,8 +8,8 @@ import { SummaryComponent } from './components/summary.component';
 const routes: Routes = [
   {path:'', component:SearchComponent},
   {path:'display/:id/:destination', component:DisplayComponent},
-  {path: 'map/:object', component:MapComponent},
-  {path: 'summary/:carPark', component:SummaryComponent},
+  {path: 'map/:object/:id', component:MapComponent},
+  {path: 'summary/:carPark/:id', component:SummaryComponent},
   {path: "**", redirectTo:'/', pathMatch: 'full'}
 ];
 

@@ -11,6 +11,7 @@ import { SearchService } from '../services/search.service';
 export class SummaryComponent implements OnInit {
   carP! : Carpark
   notDeleted : Boolean = false
+  id! : string
   constructor(private activatedRoute : ActivatedRoute, private router : Router, private searchSvc : SearchService) {
 
   }
@@ -29,15 +30,16 @@ export class SummaryComponent implements OnInit {
           lotsAvailable : cP.lotsAvailable
         } as Carpark
 
+        this.id = params['id'] as string
 
       })
   }
 
   return() {
-    this.searchSvc.deleteRecord(this.carP.carParkId).then((value) => {
-                            const jo = JSON.parse(value)
+    this.searchSvc.deleteRecord(this.id).then((value : any) => {
+                            // const jo = JSON.parse(value)
 
-                            if ('OK' in jo) {
+                            if ('OK' in value) {
                               this.router.navigate(['/'])
                             } else {
                               this.notDeleted = true
