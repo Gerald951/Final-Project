@@ -28,13 +28,9 @@ public class AppRepository {
     public static final String GET_NEARBY_CARPARKS = "select *,(6371000 * Acos (Cos (Radians(@userLatitude)) * Cos(Radians(latitude)) * Cos(Radians(longitude) - Radians(@userLongitude)) + Sin (Radians(@userLatitude)) * Sin(Radians(latitude)))) as distance_m"
                                                         + " from parkingLocation having distance_m < ? order by distance_m";
     public static final String GET_CARPARKS_ID = "select * from parkingLocation where address=?";
-    // public static final String GET_URA_RATES_A = "select * from URAcarpark where carpark_id=? and tend_time > TIME(?)";
-    // public static final String GET_URA_RATES_B = "select * from URAcarpark where carpark_id=?";
     public static final String GET_SHOPPING_RATES_A = "select * from shoppingCarparkRate where carpark_id=? and range_start<=? and range_end>=? and tend_time > TIME(?)";
     public static final String GET_SHOPPING_RATES_B = "select * from shoppingCarparkRate where carpark_id=? and range_start<=? and range_end>=? and tstart_time < TIME(?)";
-    // public static final String MYSQL_URL = "jdbc:mysql://localhost:3306/database";
-    // public static final String MYSQL_USER = "root";
-    // public static final String MYSQL_PASSWORD = "Sa84684663";
+  
 
 
     @Autowired
@@ -103,61 +99,6 @@ public class AppRepository {
 
         return Id;
     }
-
-    // public List<URACarPark> checkURAcarparkA(String carParkId, String startTime) {
-    //     List<URACarPark> listOfURAcp = jdbcTemplate.query(GET_URA_RATES_A, new ResultSetExtractor<List<URACarPark>>() {
-    //         @Override
-    //         public List<URACarPark> extractData(ResultSet rs) throws SQLException {
-    //             List<URACarPark> listOfURAcarparks = new LinkedList<>();
-    //             while(rs.next()) {
-    //                 URACarPark uraCarPark = new URACarPark();
-    //                 uraCarPark.setWeekday_min(rs.getString("weekday_min"));
-    //                 uraCarPark.setWeekday_rate(rs.getString("weekday_rate"));
-    //                 uraCarPark.setSatday_rate(rs.getString("satday_rate"));
-    //                 uraCarPark.setSunPH_rate(rs.getString("sunPH_rate"));
-    //                 uraCarPark.setEnd_time(rs.getString("tend_time"));
-    //                 uraCarPark.setStart_time(rs.getString("tstart_time"));
-    //                 listOfURAcarparks.add(uraCarPark);
-    //             }
-
-    //             if (listOfURAcarparks.isEmpty()) {
-    //                 return null;
-    //             } else {
-    //                 return listOfURAcarparks;
-    //             }
-    //         }
-    //     }, carParkId, startTime);
-
-    //     return listOfURAcp;
-    // }
-
-    // public List<URACarPark> checkURAcarparkB(String carparkId) {
-    //     List<URACarPark> listOfURAcp = jdbcTemplate.query(GET_URA_RATES_B, new ResultSetExtractor<List<URACarPark>>() {
-    //         @Override
-    //         public List<URACarPark> extractData(ResultSet rs) throws SQLException {
-    //             List<URACarPark> listOfURAcarparks = new LinkedList<>();
-    //             while(rs.next()) {
-    //                 URACarPark uraCarPark = new URACarPark();
-    //                 uraCarPark.setWeekday_min(rs.getString("weekday_min"));
-    //                 uraCarPark.setWeekday_rate(rs.getString("weekday_rate"));
-    //                 uraCarPark.setSatday_rate(rs.getString("satday_rate"));
-    //                 uraCarPark.setSunPH_rate(rs.getString("sunPH_rate"));
-    //                 uraCarPark.setEnd_time(rs.getString("end_time"));
-    //                 uraCarPark.setStart_time(rs.getString("start_time"));
-    //                 listOfURAcarparks.add(uraCarPark);
-    //             }
-
-    //             if (listOfURAcarparks.isEmpty()) {
-    //                 return null;
-    //             } else {
-    //                 return listOfURAcarparks;
-    //             }
-    //         }
-    //     }, carparkId);
-
-    //     return listOfURAcp;
-
-    // }
 
     public List<ShoppingCarPark> getShoppingCarparkA(String carparkId, Integer dayOfWeekInt, String startTimeString) {
         List<ShoppingCarPark> listOfShopCP = jdbcTemplate.query(GET_SHOPPING_RATES_A, new ResultSetExtractor<List<ShoppingCarPark>>() {
