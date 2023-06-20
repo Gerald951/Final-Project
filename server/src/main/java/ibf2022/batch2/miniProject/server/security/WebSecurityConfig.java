@@ -19,7 +19,6 @@ import ibf2022.batch2.miniProject.server.security.jwt.AuthTokenFilter;
 import ibf2022.batch2.miniProject.server.security.services.UserDetailsServiceImpl;
 
 
-
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig {

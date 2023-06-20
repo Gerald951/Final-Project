@@ -61,6 +61,7 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    System.out.println(userDetails);
 
     ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
@@ -77,6 +78,7 @@ public class AuthController {
 
   @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
     }
@@ -84,15 +86,16 @@ public class AuthController {
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
     }
-
+    
     // Create new user's account
     User user = new User(signUpRequest.getUsername(),
                          signUpRequest.getEmail(),
                          encoder.encode(signUpRequest.getPassword()));
 
     Set<String> strRoles = signUpRequest.getRole();
+    
     Set<Role> roles = new HashSet<>();
-
+    
     if (strRoles == null) {
       Role userRole = roleRepository.findByName(ERole.ROLE_USER)
           .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
@@ -119,7 +122,7 @@ public class AuthController {
         }
       });
     }
-
+    
     user.setRoles(roles);
     userRepository.save(user);
 

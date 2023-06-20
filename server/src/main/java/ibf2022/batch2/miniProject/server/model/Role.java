@@ -1,17 +1,14 @@
 package ibf2022.batch2.miniProject.server.model;
 
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "roles")
 public class Role {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @Id
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    // @Enumerated(EnumType.STRING)
+    // @Column(length = 20)
     private ERole name;
 
     public Role() {
