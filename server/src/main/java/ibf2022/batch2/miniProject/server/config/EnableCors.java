@@ -18,7 +18,8 @@ public class EnableCors implements WebMvcConfigurer {
         registry.addMapping(path)
                 .allowedOrigins(origins)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("Content_Type", "Authorization");
+                .allowedHeaders("content_type", "Authorization")
+                .allowCredentials(true);
     }
     
 }

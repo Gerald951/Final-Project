@@ -1,0 +1,69 @@
+
+.login-container {
+    margin-top: 50px;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    
+  }
+  
+  form {
+    width: 100%;
+    margin-top: 50px;
+    margin-left: 75px;
+  }
+  
+  .login-content {
+    width: 400px;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .login-toolbar {
+    justify-content: center;
+    background-color: grey;
+    color: black;
+    font-style:normal;
+  }
+  
+  .mat-form-field {
+    width: 100%;
+    display: block;
+    align-items: center;
+  }
+  
+  .mat-raised-button {
+    width: 100%;
+    height: 60px;
+    margin-top: 15px;
+  }
+
+  .button-class {
+    margin-left: 80px;
+  }
+
+  .register {
+    color: lightskyblue;
+  }
+
+  .span {
+    margin-left: 20px;
+  }
+
+  .error {
+    margin-right: 5px;
+  }
+
+  mat-toolbar {
+    background-color: grey;
+    padding-top: 70px;
+  }
+
+  mat-card {
+    background-color: grey;
+    margin-top: -10px;
+    box-shadow: none;
+  border: none;
+    
+  }

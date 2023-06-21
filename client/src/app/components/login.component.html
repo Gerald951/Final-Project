@@ -1,5 +1,36 @@
-<h1>Car Lot Availability App</h1>
 
-<form [formGroup]="loginForm" (ngSubmit)="submit()">
-    
-</form>
+	<div class="login-container">
+		<div class="login-content">
+			
+			<mat-card>
+                <mat-toolbar class="login-toolbar">Login Page</mat-toolbar>
+				<form [formGroup]="loginForm" #formDirective="ngForm"
+                (ngSubmit)="submit()" >
+					<mat-form-field>
+						<mat-icon matPrefix>person_outline</mat-icon>
+						<input autofocus type="text" matInput placeholder="Username" formControlName="username">
+					</mat-form-field>
+
+					<mat-form-field>
+						<mat-icon matPrefix>lock_outline</mat-icon>
+						<input type="password" autocomplete="false" matInput placeholder="Password"  formControlName="password">
+					</mat-form-field>
+                    <div class="button-class">
+                        <mat-error class="error" *ngIf="loginForm.invalid">Please ensure username and password is minimum 3 and 8 characters, respectively</mat-error>
+					    <button type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">LOGIN</button>
+                    </div>
+                    
+                </form>
+          <br>
+          <span class="span"> Don't have an existing account? Please <a class="register" routerLink ='/register'>REGISTER HERE</a></span>
+
+
+
+				
+			</mat-card>
+		</div>
+
+        <div class="alert alert-success" *ngIf="isLoggedIn">
+            Logged in as {{ roles }}.
+          </div>
+	</div>

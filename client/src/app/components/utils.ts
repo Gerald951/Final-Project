@@ -1,4 +1,4 @@
-import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
+import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from "@angular/forms";
 
 export function dateComparisonValidator(): ValidatorFn {
     return (control : AbstractControl)  : ValidationErrors | null => {
@@ -30,6 +30,21 @@ export function dateComparisonValidator(): ValidatorFn {
 
   }
 
+  export function checkPassword() : ValidatorFn {
+    return (control : AbstractControl) : ValidationErrors | null => {
+        const form = control as FormGroup
+
+        const password = form.get('password')
+        const repeatPassword = form.get('password2')
+
+        if (password!=null && repeatPassword!=null && password.toString() === repeatPassword.toString()) {
+            return null
+        } else {
+            return { passwordNotEqual : true }
+        }
+    }
+  }
+
 export function generate8RandomChar() : string {
     let result = ''
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -46,5 +61,7 @@ export function generate8RandomChar() : string {
 
 
 }
+
+
 
 

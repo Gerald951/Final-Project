@@ -34,6 +34,7 @@ import { HomeComponent } from './components/home.component';
 import { ProfileComponent } from './components/profile.component';
 import { BoardUserComponent } from './components/board-user.component';
 import { httpInterceptorProviders } from './helpers/http.interceptor.service';
+import { MatCardModule } from '@angular/material/card';
 
 
 
@@ -74,7 +75,8 @@ import { httpInterceptorProviders } from './helpers/http.interceptor.service';
     MatTableModule,
     MatSortModule,
     MatProgressSpinnerModule,
-    GoogleMapsModule
+    GoogleMapsModule,
+    MatCardModule
 
 
   

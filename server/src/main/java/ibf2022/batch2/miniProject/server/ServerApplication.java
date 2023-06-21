@@ -16,7 +16,7 @@ public class ServerApplication {
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		return new EnableCors("/**", "*");
+		return new EnableCors("/**", "http://localhost:4200");
 	}
 
 }

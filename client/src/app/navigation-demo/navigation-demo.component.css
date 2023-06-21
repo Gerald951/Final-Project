@@ -19,3 +19,11 @@
 .content-wrapper {
   margin-top: 16px; /* Adjust the value as per your preference */
 }
+
+mat-sidenav-content {
+  background-color: grey;
+}
+
+mat-toolbar {
+  color:aqua
+}

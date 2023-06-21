@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,17 +15,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+// import org.springframework.web.bind.annotation.RestController;
 
 import ibf2022.batch2.miniProject.server.model.ERole;
 import ibf2022.batch2.miniProject.server.model.Role;
 import ibf2022.batch2.miniProject.server.model.User;
 import ibf2022.batch2.miniProject.server.payload.request.LoginRequest;
-import ibf2022.batch2.miniProject.server.payload.request.SignupRequest;
 import ibf2022.batch2.miniProject.server.payload.response.MessageResponse;
 import ibf2022.batch2.miniProject.server.payload.response.UserInfoResponse;
 import ibf2022.batch2.miniProject.server.repositories.RoleRepository;
@@ -33,8 +35,8 @@ import ibf2022.batch2.miniProject.server.security.jwt.JwtUtils;
 import ibf2022.batch2.miniProject.server.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
-@RestController
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
+@Controller
 @RequestMapping("/api/auth")
 public class AuthController {
   @Autowired
@@ -76,52 +78,36 @@ public class AuthController {
                                    roles));
   }
 
-  @PostMapping("/signup")
-  public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-    
-    if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+  @PostMapping(path = "/signup", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public ResponseEntity<?> registerUser(@RequestBody MultiValueMap<String, String> signUpForm) {
+    System.out.println("HELPPPP LAHHH");
+    String username = signUpForm.getFirst("username");
+    System.out.println(username);
+    String password = signUpForm.getFirst("password");
+    System.out.println(password);
+    String email = signUpForm.getFirst("email");
+    System.out.println(email);
+    System.out.println("HELPPPP LAHHH");
+    if (userRepository.existsByUsername(username)) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
     }
 
-    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+    if (userRepository.existsByEmail(email)) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
     }
     
     // Create new user's account
-    User user = new User(signUpRequest.getUsername(),
-                         signUpRequest.getEmail(),
-                         encoder.encode(signUpRequest.getPassword()));
-
-    Set<String> strRoles = signUpRequest.getRole();
+    User user = new User(username,
+                         email ,
+                         encoder.encode(password));
     
     Set<Role> roles = new HashSet<>();
     
-    if (strRoles == null) {
-      Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-      roles.add(userRole);
-    } else {
-      strRoles.forEach(role -> {
-        switch (role) {
-        case "admin":
-          Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(adminRole);
-
-          break;
-        case "mod":
-          Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(modRole);
-
-          break;
-        default:
-          Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(userRole);
-        }
-      });
-    }
+    
+    Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+    roles.add(userRole);
+  
     
     user.setRoles(roles);
     userRepository.save(user);

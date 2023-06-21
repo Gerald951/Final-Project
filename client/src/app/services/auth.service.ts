@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 const AUTH_API = 'http://localhost:8080/api/auth/';
 
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' })
 };
 
 @Injectable({
@@ -26,13 +26,12 @@ export class AuthService {
   }
 
   register(username: string, email: string, password: string): Observable<any> {
+    const body = new HttpParams().set('username', username).set('email', email).set('password', password)
+
+
     return this.http.post(
       AUTH_API + 'signup',
-      {
-        username,
-        email,
-        password,
-      },
+      body.toString(),
       httpOptions
     );
   }

@@ -1,1 +1,51 @@
-<p>register works!</p>
+<div class="login-container">
+    <div class="login-content">
+        
+        <mat-card>
+            <button class="top-button" type="button" routerLink="/" mat-raised-button color="primary">BACK</button>
+            <mat-toolbar class="login-toolbar">Registration</mat-toolbar>
+            <form [formGroup]="registerForm"
+            (ngSubmit)="submit()" >
+                <mat-form-field>
+                    <mat-icon matPrefix>person_outline</mat-icon>
+                    <input autofocus type="text" matInput placeholder="Username" formControlName="username">
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-icon matPrefix>email</mat-icon>
+                    <input autofocus type="email" autocomplete="false" matInput placeholder="Email" formControlName="email">
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-icon matPrefix>lock_outline</mat-icon>
+                    <input [type]= "hidePassword ? 'password' : 'text'" autocomplete="false" matInput placeholder="Password"  formControlName="password">
+                    <mat-icon class="mat-class" matSuffix (click)="hidePassword = !hidePassword">{{ hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-icon matPrefix>lock_outline</mat-icon>
+                    <input [type]= "hidePassword ? 'password' : 'text'" autocomplete="false" matInput placeholder="Repeat Password"  formControlName="password2">
+                    <mat-icon class="mat-class" matSuffix (click)="hidePassword2 = !hidePassword2">{{ hidePassword2 ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+                <div class="button-class">
+                    <mat-error class="error" *ngIf="registerForm!.touched && registerForm!.invalid">Please ensure username and password is minimum 3 and 8 characters, respectively.</mat-error>
+                </div>
+                &nbsp;
+                <div>
+                    <button type="submit" mat-raised-button color="primary" [disabled]="!registerForm.valid">REGISTER</button>
+                </div>
+                    
+                
+                
+            </form>
+      <br> 
+        <div>
+            <mat-error *ngIf="isSignUpFailed">{{errorMessage}}</mat-error>
+        </div>           
+        </mat-card>
+    </div>
+
+    <div class="alert alert-success" *ngIf="isSuccessful">
+        Registration is Successful. Please press <a routerLink="/">BACK</a> to login.
+      </div>
+</div>
