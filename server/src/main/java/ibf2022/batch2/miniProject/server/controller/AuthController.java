@@ -80,14 +80,10 @@ public class AuthController {
 
   @PostMapping(path = "/signup", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> registerUser(@RequestBody MultiValueMap<String, String> signUpForm) {
-    System.out.println("HELPPPP LAHHH");
     String username = signUpForm.getFirst("username");
-    System.out.println(username);
     String password = signUpForm.getFirst("password");
-    System.out.println(password);
     String email = signUpForm.getFirst("email");
-    System.out.println(email);
-    System.out.println("HELPPPP LAHHH");
+   
     if (userRepository.existsByUsername(username)) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
     }
