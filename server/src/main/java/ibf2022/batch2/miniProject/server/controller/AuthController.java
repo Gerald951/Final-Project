@@ -26,14 +26,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ibf2022.batch2.miniProject.server.model.ERole;
 import ibf2022.batch2.miniProject.server.model.Role;
 import ibf2022.batch2.miniProject.server.model.User;
-import ibf2022.batch2.miniProject.server.payload.request.LoginRequest;
 import ibf2022.batch2.miniProject.server.payload.response.MessageResponse;
 import ibf2022.batch2.miniProject.server.payload.response.UserInfoResponse;
 import ibf2022.batch2.miniProject.server.repositories.RoleRepository;
 import ibf2022.batch2.miniProject.server.repositories.UserRepository;
 import ibf2022.batch2.miniProject.server.security.jwt.JwtUtils;
 import ibf2022.batch2.miniProject.server.security.services.UserDetailsImpl;
-import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
 @Controller
@@ -54,11 +52,13 @@ public class AuthController {
   @Autowired
   JwtUtils jwtUtils;
 
-  @PostMapping("/signin")
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+  @PostMapping(path = "/signin", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public ResponseEntity<?> authenticateUser(@RequestBody MultiValueMap<String, String> signInForm) {
+    String username = signInForm.getFirst("username");
+    String password = signInForm.getFirst("password");
 
     Authentication authentication = authenticationManager
-        .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        .authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -66,11 +66,13 @@ public class AuthController {
     System.out.println(userDetails);
 
     ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+    System.out.println(jwtCookie.toString());
 
     List<String> roles = userDetails.getAuthorities().stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
-
+        
+    System.out.println(roles);
     return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
         .body(new UserInfoResponse(userDetails.getId(),
                                    userDetails.getUsername(),
@@ -111,7 +113,7 @@ public class AuthController {
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
   }
 
-  @PostMapping("/signout")
+  @PostMapping(path= "/signout", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> logoutUser() {
     ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
     return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())

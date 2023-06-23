@@ -29,13 +29,16 @@
                 </mat-form-field>
                 <div class="button-class">
                     <mat-error class="error" *ngIf="registerForm!.touched && registerForm!.invalid">Please ensure username and password is minimum 3 and 8 characters, respectively.</mat-error>
+                    <div class="alert alert-success" *ngIf="isSuccessful">
+                        Registration is Successful. Please press <a routerLink="/">BACK</a> to login.
+                    </div>
+                    <mat-error *ngIf="registerForm.hasError('passwordNotEqual') && registerForm!.touched">Passwords do not match.
+                    </mat-error>
                 </div>
                 &nbsp;
                 <div>
                     <button type="submit" mat-raised-button color="primary" [disabled]="!registerForm.valid">REGISTER</button>
                 </div>
-                    
-                
                 
             </form>
       <br> 
@@ -45,7 +48,5 @@
         </mat-card>
     </div>
 
-    <div class="alert alert-success" *ngIf="isSuccessful">
-        Registration is Successful. Please press <a routerLink="/">BACK</a> to login.
-      </div>
+    
 </div>

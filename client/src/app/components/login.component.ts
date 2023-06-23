@@ -2,6 +2,7 @@ import { Component, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { AuthService } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -15,16 +16,10 @@ export class LoginComponent implements OnInit {
   errorMessage = ''
   roles : string[] = []
 
-  constructor(private fb : FormBuilder, private authSvc: AuthService, private storageSvc : StorageService) {}
+  constructor(private fb : FormBuilder, private authSvc: AuthService, private storageSvc : StorageService, private router : Router) {}
 
   ngOnInit(): void {
-    if (this.storageSvc.isLoggedIn()) {
-      this.isLoggedIn = true
-      this.roles = this.storageSvc.getUser().roles
-    } else {
-       this.loginForm = this.createForm()
-    }
-     
+    this.loginForm = this.createForm()
   }
 
   createForm() {
@@ -39,12 +34,14 @@ export class LoginComponent implements OnInit {
     const password = this.loginForm.value.password
     this.authSvc.login(username, password).subscribe({
       next:data => {
+        console.info(data)
         this.storageSvc.saveUser(data)
 
-        this.isLoginFailed = false
-        this.isLoggedIn = true
-        this.roles = this.storageSvc.getUser().roles
-        this.reloadPage()
+        // this.isLoginFailed = false
+        // this.isLoggedIn = true
+        // this.roles = this.storageSvc.getUser().roles
+        // this.reloadPage()
+        this.router.navigate(['/search'])
       },
       error:err => {
         this.errorMessage = err.errorMessage

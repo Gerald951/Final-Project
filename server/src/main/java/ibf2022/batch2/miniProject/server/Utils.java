@@ -31,7 +31,6 @@ import jakarta.json.JsonReader;
 
 public class Utils {
     
-    public final static String[] carParksWithinCentral = {"ACB", "BBB", "BRB1", "CY", "DUXM", "HLM", "KAB", "KAM", "KAS", "PRM", "SLS", "SR1", "SR2", "TPM", "UCS", "WCB"};
 	public final static String[] shoppingCenters = {"Harbourfront Centre", "Resorts World Sentosa", "VivoCity P2", "VivoCity P3", "Sentosa", "Westgate", "IMM Building", "JCube", "National Gallery", "Singapore Flyer", 
 													"Millenia Singapore", "The Esplanade", "Raffles City", "Marina Square", "Suntec City", "Marina Bay Sands", "Centrepoint", "Cineleisure", "Orchard Point", "Concorde Hotel", "Plaza Singapura",
 													"The Cathay", "Mandarin Hotel", "Wisma Atria", "The Heeren", "Ngee Ann City", "Orchard Central", "Wheelock Place", "Orchard Gateway", "Tang Plaza", "Far East Plaza", "Paragon",
@@ -65,6 +64,14 @@ public class Utils {
 
 		return list;
     }
+
+	public static String checkForLot(String lot) {
+		if (lot.equalsIgnoreCase("0*")) {
+			return "0";
+		} else {
+			return lot;
+		}
+	}
 
     public static List<String> getColumnAsList(int columnNumber, FileReader rdr) {
 		List<String> columnList = new ArrayList<>();

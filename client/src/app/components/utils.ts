@@ -37,7 +37,7 @@ export function dateComparisonValidator(): ValidatorFn {
         const password = form.get('password')
         const repeatPassword = form.get('password2')
 
-        if (password!=null && repeatPassword!=null && password.toString() === repeatPassword.toString()) {
+        if (password && repeatPassword && password.value === repeatPassword.value) {
             return null
         } else {
             return { passwordNotEqual : true }

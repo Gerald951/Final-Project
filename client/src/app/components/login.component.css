@@ -1,69 +1,85 @@
 
 .login-container {
-    margin-top: 50px;
-    height: 100%;
-    width: 100%;
-    align-items: center;
-    display: flex;
-    
-  }
+  margin-top: 50px;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  display: flex;
   
-  form {
-    width: 100%;
-    margin-top: 50px;
-    margin-left: 75px;
-  }
+}
+
+form {
+  width: 100%;
+  margin-top: 10px;
+  margin-left: 75px;
+}
+
+.login-content {
+  width: 400px;
+  display: block;
+  margin: 0 auto;
+}
+
+.login-toolbar {
+  justify-content: center;
+  background-color: grey;
+  color: black;
+  font-style:normal;
+  margin-left: 1px;
+  margin-bottom: 20px;
+}
+
+.mat-raised-button {
+  width: 100%;
+  height: 60px;
+  margin-top: 15px;
+}
+
+.button-class {
+  margin-left: 0px;
+}
+
+button {
+  margin-left: 90px;
+}
+
+.top-button {
+  justify-content: center;
+  width: min-content;
+  margin-left: 50px;
+  margin-top: 0px;
+  box-shadow: none;
+border: none;
+}
+
+.register {
+  color: lightskyblue;
+}
+
+.span {
+  margin-left: 20px;
+}
+
+.error {
+  align-items: center;
+  align-content: center;
+  padding-right: 50px;
+}
+
+mat-toolbar {
+  background-color: grey;
+  padding-top: 20px;
+}
+
+mat-card {
+  background-color: grey;
+  margin-top: -10px;
+  box-shadow: none;
+border: none;
   
-  .login-content {
-    width: 400px;
-    display: block;
-    margin: 0 auto;
-  }
-  
-  .login-toolbar {
-    justify-content: center;
-    background-color: grey;
-    color: black;
-    font-style:normal;
-  }
-  
-  .mat-form-field {
-    width: 100%;
-    display: block;
-    align-items: center;
-  }
-  
-  .mat-raised-button {
-    width: 100%;
-    height: 60px;
-    margin-top: 15px;
-  }
+}
 
-  .button-class {
-    margin-left: 80px;
-  }
+.mat-class {
+  margin-left: -34px;
+}
 
-  .register {
-    color: lightskyblue;
-  }
-
-  .span {
-    margin-left: 20px;
-  }
-
-  .error {
-    margin-right: 5px;
-  }
-
-  mat-toolbar {
-    background-color: grey;
-    padding-top: 70px;
-  }
-
-  mat-card {
-    background-color: grey;
-    margin-top: -10px;
-    box-shadow: none;
-  border: none;
-    
-  }

@@ -19,7 +19,7 @@ export class MapComponent implements OnInit, OnDestroy{
   directionsResults$! : Observable<google.maps.DirectionsResult|undefined>
   center: google.maps.LatLngLiteral = {lat: 0, lng: 0};
   zoom = 4;
-  destinationOptions: string[] = ["Harbourfront Centre", "Resorts World Sentosa", "VivoCity P2", "VivoCity P3", "Sentosa", "Westgate", "IMM Building", "JCube", "National Gallery", "Singapore Flyer", 
+  destinationOptions: string[] = ["Harbourfront Centre", "Resorts World Sentosa", "VivoCity P2", "VivoCity P3", "Sentosa", "Westgate", "Imm Building", "JCube", "National Gallery", "Singapore Flyer", 
   "Millenia Singapore", "The Esplanade", "Raffles City", "Marina Square", "Suntec City", "Marina Bay Sands", "Centrepoint", "Cineleisure", "Orchard Point", "Concorde Hotel", "Plaza Singapura",
   "The Cathay", "Mandarin Hotel", "Wisma Atria", "The Heeren", "Ngee Ann City", "Orchard Central", "Wheelock Place", "Orchard Gateway", "Tang Plaza", "Far East Plaza", "Paragon",
   "313@Somerset", "The Atrium@Orchard", "Bukit Panjang Plaza", "Clarke Quay", "The Star Vista", "Funan Mall", "Lot One", "Tampines Mall", "Junction 8", "Bedok Mall", "Bugis+"];
@@ -127,22 +127,21 @@ export class MapComponent implements OnInit, OnDestroy{
   trackLocation(directionsRenderer: google.maps.DirectionsRenderer) {
     let watchId: number;
   
-    this.sub$ = interval(120000).subscribe(() => {
+    this.sub$ = interval(138000).subscribe(() => {
       console.info('Checking Lot Availability...')
-      const carParkLot$ = this.destinationOptions.includes(this.cp.address)
-        ? this.searchSvc.getLotAvailability(this.cp.address, "S")
-        : this.searchSvc.getLotAvailability(this.cp.address, "C");
-  
-      carParkLot$.then((lot: any) => {
-        console.info(lot);
-  
+      const carParkLot$ = this.searchSvc.getLotAvailability(this.id, this.cp.carParkId);
+      carParkLot$.then((lot : any) => {
+        console.info(lot)
+
         if ('OK' in lot) {
           this.notExist = false;
+
         } else {
           this.notExist = true;
         }
-      });
-    });
+      })
+    })
+   
   
     if (navigator.geolocation) {
       this.watchId = navigator.geolocation.watchPosition((position) => {

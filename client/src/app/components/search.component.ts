@@ -7,6 +7,7 @@ import { map, Subscription } from 'rxjs';
 import { Carpark } from '../model/carpark';
 import { HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-search',
@@ -22,7 +23,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   listOfCP : Carpark[] = []
   sub$! : Subscription
 
-  constructor(private fb : FormBuilder, private searchSvc : SearchService, private router : Router) {}
+  constructor(private fb : FormBuilder, private searchSvc : SearchService, private router : Router, private authSvc : AuthService) {}
 
   ngOnInit(): void {
       this.form = this.fb.group({
@@ -130,7 +131,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 }
 
   ngOnDestroy(): void {
-      this.sub$.unsubscribe()
+      // this.sub$.unsubscribe()
   }
 
   getMonth(month : string) : number {
@@ -198,6 +199,17 @@ export class SearchComponent implements OnInit, OnDestroy {
       default:
         return 7;
     }
+  }
+
+  logout() {
+    this.authSvc.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/'])
+      },
+      error : () => {
+        console.log('error in logging out')
+      }
+    })
   }
   
 }

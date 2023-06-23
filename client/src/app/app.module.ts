@@ -30,9 +30,6 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { AlertComponent } from './components/alert.component';
 import { SummaryComponent } from './components/summary.component';
 import { RegisterComponent } from './components/register.component';
-import { HomeComponent } from './components/home.component';
-import { ProfileComponent } from './components/profile.component';
-import { BoardUserComponent } from './components/board-user.component';
 import { httpInterceptorProviders } from './helpers/http.interceptor.service';
 import { MatCardModule } from '@angular/material/card';
 
@@ -48,10 +45,7 @@ import { MatCardModule } from '@angular/material/card';
     MapComponent,
     AlertComponent,
     SummaryComponent,
-    RegisterComponent,
-    HomeComponent,
-    ProfileComponent,
-    BoardUserComponent
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

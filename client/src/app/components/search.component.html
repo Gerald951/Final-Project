@@ -46,4 +46,6 @@
 
   <div class="err" *ngIf="form!.touched && form!.invalid">Please make sure DateIn/TimeIn is selected before DateOut/TimeOut</div>
   <button class="button" type="submit" [disabled]="!form.valid">Submit</button>
+  &nbsp;
+  <button type="button" (click)="logout()">Log Out</button>
 </form>

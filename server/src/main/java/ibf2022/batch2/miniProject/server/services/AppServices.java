@@ -11,6 +11,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import ibf2022.batch2.miniProject.server.Utils;
@@ -29,6 +30,8 @@ public class AppServices {
 
     private final String shoppingCenters_URL = "https://sgcarparks.atpeaz.com/";
     private final String carParks_URL = "https://sgcarparks.atpeaz.com/h";
+	List<CarPark> listOfCarParks = null;
+	String destinationId = null;
 
     @Autowired
     private AppRepository appRepository;
@@ -36,10 +39,117 @@ public class AppServices {
 	@Autowired
 	private MongoRepository mongoRepository;
     
-    public Integer getLotAvailability(String shoppingCenter) {
+	@Scheduled(fixedDelay = 120000)
+    public void getLotAvailability() {
 		
-        Integer shoppingCenterID = Utils.getMapOfLocationId().get(shoppingCenter);
-		System.out.println(shoppingCenter);
+		if (listOfCarParks != null && destinationId != null) {
+
+			for (CarPark c : listOfCarParks) {
+				if (Utils.isShopping(c.getCarParkId())) {
+					Integer shoppingCenterID = Utils.getMapOfLocationId().get(c.getAddress().trim());
+					System.out.println(c.getAddress());
+
+					try {
+						URL obj = new URL(shoppingCenters_URL);
+						HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+						// optional request header
+						con.setRequestProperty("User-Agent", "Mozilla/5.0");
+						int responseCode = con.getResponseCode();
+						System.out.println("Response code: " + responseCode);
+						BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+						String inputLine;
+						StringBuilder response = new StringBuilder();
+
+						while ((inputLine = in.readLine()) != null) {
+						response.append(inputLine);
+						}
+
+						in.close();
+						String html = response.toString();
+						// System.out.println(html);
+
+						//Parse HTML content using Jsoup
+						Document doc = Jsoup.parse(html);
+						// get the season parking lot availability
+						
+						String trId = "tr#" + Integer.toString(shoppingCenterID); 
+						
+						Element trElement = doc.selectFirst(trId);
+
+						if (trElement != null) {
+							Element tdElement = trElement.selectFirst("td:nth-child(2)");
+							c.setLotsAvailable(Utils.checkForLot(tdElement.text()));
+							mongoRepository.insertCarpark(destinationId, c);
+
+						} else {
+							c.setLotsAvailable("No Data");
+							mongoRepository.insertCarpark(destinationId, c);
+						}	
+
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
+						c.setLotsAvailable("No Data");
+						mongoRepository.insertCarpark(destinationId, c);
+					}
+				} else {
+					
+					String carparkId = appRepository.getCarparkId(c.getAddress());
+					
+					System.out.println(carparkId);
+
+					try {
+						URL obj = new URL(carParks_URL);
+						HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+						// optional request header
+						con.setRequestProperty("User-Agent", "Mozilla/5.0");
+						int responseCode = con.getResponseCode();
+						System.out.println("Response code: " + responseCode);
+						BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+						String inputLine;
+						StringBuilder response = new StringBuilder();
+
+						while ((inputLine = in.readLine()) != null) {
+						response.append(inputLine);
+						}
+
+						in.close();
+						String html = response.toString();
+						// System.out.println(html);
+
+						//Parse HTML content using Jsoup
+						Document doc = Jsoup.parse(html);
+						// get the season parking lot availability
+						String trId = "tr#" + carparkId; 
+						Element trElement = doc.selectFirst(trId);
+
+						if (trElement != null) {
+							Element tdElement = trElement.selectFirst("td:nth-child(2)");
+							c.setLotsAvailable(Utils.checkForLot(tdElement.text()));
+							mongoRepository.insertCarpark(destinationId, c);
+						} else {
+							c.setLotsAvailable("No Data");
+							mongoRepository.insertCarpark(destinationId, c);
+						}
+
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
+						c.setLotsAvailable("No Data");
+						mongoRepository.insertCarpark(destinationId, c);
+					}
+				}
+			}
+			
+		} else {
+			
+		}
+        
+
+    }
+
+
+	public Integer getLotAvailability(String sc) {
+		Integer shoppingCenterID = Utils.getMapOfLocationId().get(sc);
+		System.out.println(sc);
 
 		try {
 			URL obj = new URL(shoppingCenters_URL);
@@ -72,20 +182,22 @@ public class AppServices {
 				Element tdElement = trElement.selectFirst("td:nth-child(2)");
 				return Integer.parseInt(tdElement.text());
 			} else {
-                return null;
-            }	
+				return null;
+			}	
 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
-            return 0;
+			return 0;
 		}
+	}
 
-    }
+	public String getCarParkLotAvailability(String cp) {
+		System.out.println(cp.toUpperCase());
+		String carparkId = appRepository.getCarparkId(cp.toUpperCase());
+		
+		System.out.println(carparkId);
 
-    public String getCarParkLotAvailability(String carPark) {
-		String carparkId = appRepository.getCarparkId(carPark);
-
-        try {
+		try {
 			URL obj = new URL(carParks_URL);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			// optional request header
@@ -121,11 +233,13 @@ public class AppServices {
 			System.out.println(e.getMessage());
 			return null;
 		}
-    }
+	}
 
-    public List<CarPark> getNearbyCarParks(String destination, Integer distance, List<String> parkedTime, List<String> exitTime, List<String> dayOfWeek) throws CoordinatesException, NearbyCarparkException, ParseException {
+    public List<CarPark> getNearbyCarParks(String id, String destination, Integer distance, List<String> parkedTime, List<String> exitTime, List<String> dayOfWeek) throws CoordinatesException, NearbyCarparkException, ParseException {
 		Coordinates coord = appRepository.getCoordinates(destination);
-		List<CarPark> listOfCarParks = appRepository.getNearbyCarparks(coord, distance);
+
+		destinationId = id;
+		listOfCarParks = appRepository.getNearbyCarparks(coord, distance);
 		System.out.println(listOfCarParks);
 
 		// Get Lot Availability
@@ -211,6 +325,10 @@ public class AppServices {
 
 	public Boolean insertDocument(Destination destination, JsonArray arr) {
 		return mongoRepository.insertDestination(destination, arr);
+	}
+
+	public String getLotAvailability(String id, String carparkId) {
+		return mongoRepository.getLotAvailability(id, carparkId);
 	}
 
 	public String getCarParkById(String id, Integer distance) {

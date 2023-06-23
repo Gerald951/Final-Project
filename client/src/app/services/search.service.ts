@@ -4,7 +4,11 @@ import { Observable, lastValueFrom, map } from 'rxjs'
 import { Destination } from '../model/destination';
 import { Carpark } from '../model/carpark';
 
-const SERVER_URL = "http://localhost:8080"
+const SERVER_URL = "http://localhost:8080/api"
+
+const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' })
+};
 
 @Injectable({
   providedIn: 'root'
@@ -16,18 +20,23 @@ export class SearchService {
 
   constructor(private http: HttpClient) { }
 
-  getLotAvailability(destination : string, type : string) {
-    const params = new HttpParams().set("destination", destination).set("type", type)
+  getLotAvailability(destinationId : string, carparkId : string) {
+    const params = new HttpParams().set("destinationId", destinationId).set("carparkId", carparkId)
     this.getLot$ = lastValueFrom(this.http.get<string>(SERVER_URL+'/search/lot', {params}))
     return this.getLot$
   }
 
   searchNearbyCarParks(d : Destination) : Observable<HttpResponse<string>> {
-    const body = JSON.stringify(d)
+    const body = new HttpParams().set('id', d.id)
+                                  .set('destination', d.destination)
+                                  .set('distance', d.distance.toString())
+                                  .set('listOfParkedTime', d.listOfParkedTime.join(", "))
+                                  .set('listOfExitTime', d.listOfExitTime.join(', '))
+                                  .set('dayOfWeek', d.dayOfWeek.join(', '))
 
-    const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=UTF-8')
+    const headers = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
 
-    return this.http.post<string>(SERVER_URL + '/search/redirect', body, {headers:headers, observe:'response'})
+    return this.http.post<string>(SERVER_URL + '/search/redirect', body.toString(), {headers:headers, observe:'response'})
   }
 
   getNearbyCP(id : string, distance : string, filter ='', sortOrder='asc', pageNumber = 0, pageSize = 3) : Observable<any> {

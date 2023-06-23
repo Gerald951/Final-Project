@@ -40,7 +40,7 @@ export class SummaryComponent implements OnInit {
                             // const jo = JSON.parse(value)
 
                             if ('OK' in value) {
-                              this.router.navigate(['/'])
+                              this.router.navigate(['/search'])
                             } else {
                               this.notDeleted = true
                             }
