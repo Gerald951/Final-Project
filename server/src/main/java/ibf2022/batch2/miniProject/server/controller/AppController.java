@@ -41,26 +41,22 @@ public class AppController {
     public ResponseEntity<String> searchLotAvailability(@RequestParam(required = true) String destinationId, @RequestParam(required = true) String carparkId) {
         String lotAvailability = appServices.getLotAvailability(destinationId, carparkId);
 
-        if (lotAvailability != null) {
-            Integer lotInteger = Integer.parseInt(lotAvailability);
-             if (lotInteger > 10) {
-                JsonObject ok = Json.createObjectBuilder().add("OK", lotAvailability).build();
+       
+        Integer lotInteger = Integer.parseInt(lotAvailability);
+            if (lotInteger > 10) {
+            JsonObject ok = Json.createObjectBuilder().add("OK", lotAvailability).build();
 
-                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(ok.toString());
-            } else if (lotInteger > 0 && lotInteger <= 10) {
-                JsonObject notOk = Json.createObjectBuilder().add("Not OK", lotAvailability).build();
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(ok.toString());
+        } else if (lotInteger > 0 && lotInteger <= 10) {
+            JsonObject notOk = Json.createObjectBuilder().add("Not OK", lotAvailability).build();
 
-                return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).contentType(MediaType.APPLICATION_JSON).body(notOk.toString());
-            } else {
-                JsonObject err = Json.createObjectBuilder().add("error", "Internal Server Error During Lot Retrieval.").build();
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body(err.toString());
-            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body(notOk.toString());
         } else {
-             JsonObject err = Json.createObjectBuilder().add("error", "Shopping Center is not found.").build();
+            JsonObject err = Json.createObjectBuilder().add("error", "Internal Server Error During Lot Retrieval.").build();
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(err.toString());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body(err.toString());
         }
+        
     }
 
     @PostMapping(path="/search/redirect", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

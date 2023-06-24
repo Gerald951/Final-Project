@@ -1,6 +1,6 @@
 /// <reference types="@types/google.maps" />
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { Carpark } from '../model/carpark';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MapDirectionsService } from '@angular/google-maps';
@@ -29,7 +29,9 @@ export class MapComponent implements OnInit, OnDestroy{
   watchId! : number
   id! : string
 
-  constructor(private activatedRoute : ActivatedRoute, private mapDirectionService : MapDirectionsService, private searchSvc : SearchService, private router: Router) {}
+  constructor(private activatedRoute : ActivatedRoute, private mapDirectionService : MapDirectionsService, 
+              private searchSvc : SearchService, private router: Router, private changeDec : ChangeDetectorRef,
+              private zone : NgZone) {}
 
   ngOnInit(): void {
       this.activatedRoute.params.subscribe(params => {
@@ -133,12 +135,13 @@ export class MapComponent implements OnInit, OnDestroy{
       carParkLot$.then((lot : any) => {
         console.info(lot)
 
-        if ('OK' in lot) {
-          this.notExist = false;
-
-        } else {
-          this.notExist = true;
-        }
+        this.notExist = false;
+    
+      })
+      .catch((error) => {
+        this.notExist = true;
+        this.changeDec.detectChanges();
+        console.info("not exists")
       })
     })
    
@@ -199,7 +202,10 @@ export class MapComponent implements OnInit, OnDestroy{
   }
 
   dismiss() {
-    this.router.navigate(['/display', this.cp.carParkId, this.cp.address])
+    this.zone.run(() => {
+      this.router.navigate(['/display', this.id, this.cp.address])
+    })
+    
   }
 
 

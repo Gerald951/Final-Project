@@ -67,7 +67,10 @@ public class MongoRepository {
 		} else {
 			// update and replace existing document
 			Update update = new Update();
-			update.set("lotAvailability", cp.getLotsAvailable());
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+
+			update.set("lotAvailability", cp.getLotsAvailable()).set("time", dateFormat.format(new Date()));
 
 			UpdateResult updatedResult = mongoTemplate.updateFirst(query, update, "carpark");
 

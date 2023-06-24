@@ -336,6 +336,8 @@ public class AppServices {
 	}
 
 	public Boolean deleteRecord(String id) {
+		listOfCarParks = null;
+		destinationId = null;
 		return mongoRepository.deleteRecord(id);
 	}
 }

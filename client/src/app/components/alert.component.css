@@ -1,4 +1,13 @@
 .alert {
     background-color: yellow;
     padding: 10px;
+    color: black;
   }
+
+p {
+  margin-left: 20px;
+}
+
+button {
+  margin-left: 20px;
+}
