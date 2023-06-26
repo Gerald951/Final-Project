@@ -1,7 +1,7 @@
 module.exports = [
     {
       context: [ '/**' ],
-      target: 'http://localhost:8080',
+      target: 'https://lurcene-kitschy-production.up.railway.app',
       secure: false
     }
   ]

@@ -29,7 +29,7 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(origins = "https://mini-project-angular-blue.vercel.app", maxAge = 3600, allowCredentials = "true")
 @Controller
 @RequestMapping("/api")
 public class AppController {

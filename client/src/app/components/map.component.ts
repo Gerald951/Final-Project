@@ -19,10 +19,6 @@ export class MapComponent implements OnInit, OnDestroy{
   directionsResults$! : Observable<google.maps.DirectionsResult|undefined>
   center: google.maps.LatLngLiteral = {lat: 0, lng: 0};
   zoom = 4;
-  destinationOptions: string[] = ["Harbourfront Centre", "Resorts World Sentosa", "VivoCity P2", "VivoCity P3", "Sentosa", "Westgate", "Imm Building", "JCube", "National Gallery", "Singapore Flyer", 
-  "Millenia Singapore", "The Esplanade", "Raffles City", "Marina Square", "Suntec City", "Marina Bay Sands", "Centrepoint", "Cineleisure", "Orchard Point", "Concorde Hotel", "Plaza Singapura",
-  "The Cathay", "Mandarin Hotel", "Wisma Atria", "The Heeren", "Ngee Ann City", "Orchard Central", "Wheelock Place", "Orchard Gateway", "Tang Plaza", "Far East Plaza", "Paragon",
-  "313@Somerset", "The Atrium@Orchard", "Bukit Panjang Plaza", "Clarke Quay", "The Star Vista", "Funan Mall", "Lot One", "Tampines Mall", "Junction 8", "Bedok Mall", "Bugis+"];
   carParkLot$! : Promise<string>
   notExist : boolean = false
   sub$! : Subscription

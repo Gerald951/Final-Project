@@ -33,7 +33,7 @@ import ibf2022.batch2.miniProject.server.repositories.UserRepository;
 import ibf2022.batch2.miniProject.server.security.jwt.JwtUtils;
 import ibf2022.batch2.miniProject.server.security.services.UserDetailsImpl;
 
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(origins = "https://mini-project-angular-blue.vercel.app", maxAge = 3600, allowCredentials = "true")
 @Controller
 @RequestMapping("/api/auth")
 public class AuthController {

@@ -4,7 +4,7 @@ import { Observable, lastValueFrom, map } from 'rxjs'
 import { Destination } from '../model/destination';
 import { Carpark } from '../model/carpark';
 
-const SERVER_URL = "http://localhost:8080/api"
+const SERVER_URL = "https://lurcene-kitschy-production.up.railway.app/api"
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' })

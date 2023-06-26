@@ -18,7 +18,7 @@ public class ServerApplication {
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		return new EnableCors("/**", "http://localhost:4200");
+		return new EnableCors("/**", "https://mini-project-angular-blue.vercel.app");
 	}
 
 }

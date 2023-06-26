@@ -14,14 +14,23 @@ public class MongoConfig {
     @Value("${spring.data.mongodb.url}")
     private String mongoUrl;
 
+    private MongoClient client = null;
+
+    @Bean
+    public MongoClient mongoClient() {
+        if (null == client) {
+            client = MongoClients.create(mongoUrl);
+            return client;
+        } else {
+            return client;
+        }
+    }
+
     @Bean
     public MongoTemplate createMongoTemplate() {
 
-        // Create a MongoClient
-        MongoClient client = MongoClients.create(mongoUrl);
-
         // shows is the name of the database.
-        MongoTemplate template = new MongoTemplate(client, "mini-project");
+        MongoTemplate template = new MongoTemplate(mongoClient(), "mini-project");
 
         return template;
     }
