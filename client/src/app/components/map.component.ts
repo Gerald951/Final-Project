@@ -125,7 +125,7 @@ export class MapComponent implements OnInit, OnDestroy{
   trackLocation(directionsRenderer: google.maps.DirectionsRenderer) {
     let watchId: number;
   
-    this.sub$ = interval(138000).subscribe(() => {
+    this.sub$ = interval(13500).subscribe(() => {
       console.info('Checking Lot Availability...')
       const carParkLot$ = this.searchSvc.getLotAvailability(this.id, this.cp.carParkId);
       carParkLot$.then((lot : any) => {

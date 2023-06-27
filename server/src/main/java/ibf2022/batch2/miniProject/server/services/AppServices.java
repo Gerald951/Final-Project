@@ -39,7 +39,7 @@ public class AppServices {
 	@Autowired
 	private MongoRepository mongoRepository;
     
-	@Scheduled(fixedDelay = 120000)
+	@Scheduled(fixedDelay = 8500)
     public void getLotAvailability() {
 		
 		if (listOfCarParks != null && destinationId != null) {

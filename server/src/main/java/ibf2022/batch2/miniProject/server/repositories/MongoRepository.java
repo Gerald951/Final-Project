@@ -118,7 +118,7 @@ public class MongoRepository {
 		String count = Long.toString(result.getDeletedCount());
 		String count2 = Long.toString(result2.getDeletedCount());
 
-		return Integer.parseInt(count) != 0 && Integer.parseInt(count2) != 0 ? true : false ;
+		return Integer.parseInt(count) != 0 || Integer.parseInt(count2) != 0 ? true : false ;
 	}
     
 }
